@@ -1,0 +1,12 @@
+Total data HLA-A*01:01 = 9434 for average length 9.5
+Total data HLA-A*03:01 = 3110 for average length 9.5
+Total data HLA-B*07:02 = 3635 for average length 9.5
+Total data HLA-B*08:01 = 837 for average length 9.5
+Total data HLA-C*07:01 = 392 for average length 9.5
+Total data HLA-C*07:02 = 777 for average length 9.5
+Final data HLA-A*01:01 = 3067 for average length 9.5
+Final data HLA-A*03:01 = 2025 for average length 9.5
+Final data HLA-B*07:02 = 2262 for average length 9.5
+Final data HLA-B*08:01 = 510 for average length 9.5
+Final data HLA-C*07:01 = 245 for average length 9.5
+Final data HLA-C*07:02 = 557 for average length 9.5
