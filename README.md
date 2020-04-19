@@ -27,18 +27,21 @@ http://www.iedb.org/database_export_v3.php
 ## Run the script ##
 
 To run the script, an example command line is: 
-python3 ssRBM.py -hla 'HLA-A*01:01' 'HLA-A*02:01' 'HLA-B*15:01' 'HLA-B*27:02' 'HLA-C*08:02' 'HLA-C*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder'
+python3 ssRBM.py -hla 'HLA-A*01:01' 'HLA-A*02:01' 'HLA-B*15:01' 'HLA-B*27:02' 'HLA-C*08:02' 'HLA-C*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder' -nameo 'string_output'
 
-This command line reads the peptides of length 9-10 residues from the file NAME_FOLDER/sample_file.txt, trains a RBM on them and deconvolves the peptides specifically binding to HLA-A*01:01, HLA-A*02:01, HLA-B*15:01, HLA-B*27:02, HLA-C*08:02, HLA-C*16:01 (HLA alleles expressed in the sample known from HLA typing). The deconvolution is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The output (trained RBM, trained classifier, table of peptides with assigned specificity) is saved in output_folder. 
+This command line reads the peptides of length 9-10 residues from the file NAME_FOLDER/output_folder/sample_file.txt, trains a RBM on them and deconvolves the peptides specifically binding to HLA-A*01:01, HLA-A*02:01, HLA-B*15:01, HLA-B*27:02, HLA-C*08:02, HLA-C*16:01 (HLA alleles expressed in the sample known from HLA typing). The deconvolution is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The output (trained RBM, trained classifier, table of peptides with assigned specificity) is saved in NAME_FOLDER/output_folder. 
 
 
 Options: 
 
--hla : list of HLA-I alleles characterizing the sample to analyze or, if a sample is not provided, for which data on IEDB should be searched
+-hla : list of HLA-I alleles characterizing the sample to analyze or, if a sample is not provided, for which data on IEDB should be searched; if for a given sample 
+this option is not provided, only a RBM is trained and RBM presentation scores are assigned to the peptides in the file provided by the -score option
 
 -i : Name of the input file with peptide sequences to analyze, saved in format .txt inside the main folder (NAME_FOLDER)
 
 -o : Name of output folder that will be created inside the main folder (NAME_FOLDER)
+
+-nameo: String that will be used in the name of files produced
 
 -rl : Range of peptide lengths in number of residues to consider (default choice is the range 8-11)
 

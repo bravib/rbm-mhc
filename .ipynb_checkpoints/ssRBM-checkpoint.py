@@ -1,11 +1,11 @@
-
+rootf = '/home/barbara/Barbara_Bravi/rbm'
 
 import argparse
 parser = argparse.ArgumentParser() 
 
-parser.add_argument('-hla', nargs = '+', type = str, required= False, help='HLA-I alleles') # For custom dataset, if not given, only scoring by RBM is performed; For IEDB dataset, if not given, it is set to 'Haplotype1'
+parser.add_argument('-hla', nargs = '+', type = str, required= False, help='HLA-I alleles') # if not given, it is set to 'Haplotype1'
 parser.add_argument('-i', type = str, required=False, help='Name of input file (with peptide sequences)') # if not given, IEDB sequences are used
-parser.add_argument('-o', type = str, required=False, help='Name of output folder') # Required for custom datasets. If not given, it is set to 'IEDB_out_Haplotype1' - see folders available at https://github.com/bravib/ssrbm
+parser.add_argument('-o', type = str, required=False, help='Name of output folder') # if not given, it is set to 'IEDB_out_Haplotype1' - see folders available at https://gitlab.com/bbravi/ssrbm
 parser.add_argument('-nameo', type = str, required=False, help='String to appear in file names')
 parser.add_argument('-rl', nargs = '+', type = int, required=False, help='Range of peptide lengths') # if not given, it is set to 8,9,10,11
 parser.add_argument('-mt', type = int, required=False, default = 1, help='0 disables training of the method and reads an existing model')
@@ -45,13 +45,16 @@ if args.rwhp == args.rwnms == 1:
    print('Cannot enable re-weighting by both non-MS and Human Proteome aa frequency')
    exit()
 
+'''
+if args.hla is None and args.i is not None:
+   print('Need the HLA haplotype of the dataset')
+   exit()
+'''
+
 if args.o is None and args.i is not None:
    print('Need an output folder')
    exit()
 
-if args.perc == 0:
-   print('Percentage of labelled data should be > 0')
-   exit()
 
 # Decide what to do 
 maketraining = args.mt # whether to train a RBM + classifier
@@ -113,6 +116,8 @@ import rbm as rbm
 import importlib
 
 
+
+
 #RBM and Decoder parameters  
 l12 = args.l12
 hu = args.hu
@@ -160,22 +165,34 @@ Haplotype10 = ['HLA-A*02:01', 'HLA-A*03:01','HLA-B*51:01', 'HLA-B*08:01', 'HLA-C
 
 
 if args.hla is None:
-    if yesreal == 0:
+    if yesreal == 1:
         set_hla = Haplotype1
         str_hla = 'Haplotype1'
         list_hla_l = list(np.unique(set_hla)) # if 2 same alleles, count as 1
         nc = len(list_hla_l)
-    if yesreal == 1:
+    if yesreal == 0:
         nc = 1
 else:
     set_hla = args.hla
     str_hla = 'custom_haplotype'
-    list_hla_l = list(np.unique(set_hla)) # if 2 same alleles, count as 1
-    nc = len(list_hla_l)
     for y in range(len(set_hla)):
         if 'HLA-A' not in set_hla[y] and 'HLA-B' not in set_hla[y] and 'HLA-C' not in set_hla[y]:
             print('HLA allele format not admitted')
             exit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Plots material
 #matplotlib.use('Agg')
@@ -317,129 +334,128 @@ aa = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R',
 aadict_rev = {k:aa[k] for k in range(len(aa))}
 aadict = {aa[k]: k for k in range(len(aa))} 
 
-pseudocount = 0.000001
-
 # import IEDB and read relevant columns
-cond = yesreal == 1 and nc!=1
-if yesreal == 0 or makereweighting or cond:
-    #filename_lab = '/home/barbara/Barbara_Bravi/iedb_uniprot/mhc_ligand_full.csv' ## here delete ##
-    filename_lab = rootf + '/mhc_ligand_full.csv'
-    iedb = pd.read_csv(filename_lab, sep=',')
-    head = iedb.columns # select relevant indices
-    index_type = 10
-    index_antigen = 11
-    index_quality = 83
-    index_species = 39
-    hla = list(iedb['MHC'].values)
-    antigen = list(iedb['Epitope.2'].values)
-    quality = list(iedb[head[index_quality]].values)
+filename_lab = '/home/barbara/Barbara_Bravi/iedb_uniprot/mhc_ligand_full.csv' ## here delete ##
+#filename_lab = rootf + '/mhc_ligand_full.csv' ## here ##
+iedb = pd.read_csv(filename_lab, sep=',')
+head = iedb.columns # select relevant indices
+index_type = 10
+index_antigen = 11
+index_quality = 83
+index_species = 39
+hla = list(iedb['MHC'].values)
+antigen = list(iedb['Epitope.2'].values)
+quality = list(iedb[head[index_quality]].values)
 
-    # define a given set of HLA types and of quality of binding assessment
-    quality_pos = ['Positive-High', 'Positive', 'Positive-Intermediate', 'Positive-Low']
+# define a given set of HLA types and of quality of binding assessment
+quality_pos = ['Positive-High', 'Positive', 'Positive-Intermediate', 'Positive-Low']
 
-    # conditions of selection of MS data
-    condition0 = iedb[head[index_type]] == 'Linear peptide'
-    condition1 = iedb[head[index_species]].isin(['human (Homo sapiens)', 'Homo sapiens']) 
-    condition2 = iedb['MHC.3'] == 'I'
-    condition3 = iedb[head[index_quality]].isin(quality_pos) 
-    condition5 = iedb['Assay.1'].isin(['cellular MHC/mass spectrometry', 'mass spectrometry', 'secreted MHC/mass spectrometry'])
-    condition_mon = iedb['MHC.2'] == 'Single allele present'
-    condition_aps = iedb['MHC.2'] == 'Allele specific purification'
+# conditions of selection of MS data
+condition0 = iedb[head[index_type]] == 'Linear peptide'
+condition1 = iedb[head[index_species]].isin(['human (Homo sapiens)', 'Homo sapiens']) 
+condition2 = iedb['MHC.3'] == 'I'
+condition3 = iedb[head[index_quality]].isin(quality_pos) 
+condition5 = iedb['Assay.1'].isin(['cellular MHC/mass spectrometry', 'mass spectrometry', 'secreted MHC/mass spectrometry'])
+condition_mon = iedb['MHC.2'] == 'Single allele present'
+condition_aps = iedb['MHC.2'] == 'Allele specific purification'
 
-    # conditions of selection of binding assay data
-    list_meth_ba = ['binding assay', 'cellular MHC/T cell inhibition','cellular MHC/competitive/fluorescence', 'cellular MHC/competitive/radioactivity','cellular MHC/direct/fluorescence', 'lysate MHC/direct/radioactivity','purified MHC/competitive/fluorescence','purified MHC/competitive/radioactivity', 'purified MHC/direct/fluorescence', 'purified MHC/direct/radioactivity']
-    condition_ba1 = iedb['Assay.3'] == 'nM'
-    condition_ba2 = iedb['Assay.1'].isin(list_meth_ba)
-    c_ex11 = iedb['Assay.1'] == 'purified MHC/direct/radioactivity'
-    c_ex12 = iedb['Assay.2'] == 'dissociation constant KD'
-    c_ex21 = iedb['Assay.1'] == 'purified MHC/direct/fluorescence'
-    c_ex22 = ['Assay.2'] == 'half maximal effective concentration (EC50)'
-    c_ex31 = iedb['Assay.1'] == 'cellular MHC/direct/fluorescence'
-    c_ex32 = iedb['Assay.2'] == 'half maximal effective concentration (EC50)'
+# conditions of selection of binding assay data
+list_meth_ba = ['binding assay', 'cellular MHC/T cell inhibition','cellular MHC/competitive/fluorescence', 'cellular MHC/competitive/radioactivity','cellular MHC/direct/fluorescence', 'lysate MHC/direct/radioactivity','purified MHC/competitive/fluorescence','purified MHC/competitive/radioactivity', 'purified MHC/direct/fluorescence', 'purified MHC/direct/radioactivity']
+condition_ba1 = iedb['Assay.3'] == 'nM'
+condition_ba2 = iedb['Assay.1'].isin(list_meth_ba)
+c_ex11 = iedb['Assay.1'] == 'purified MHC/direct/radioactivity'
+c_ex12 = iedb['Assay.2'] == 'dissociation constant KD'
+c_ex21 = iedb['Assay.1'] == 'purified MHC/direct/fluorescence'
+c_ex22 = ['Assay.2'] == 'half maximal effective concentration (EC50)'
+c_ex31 = iedb['Assay.1'] == 'cellular MHC/direct/fluorescence'
+c_ex32 = iedb['Assay.2'] == 'half maximal effective concentration (EC50)'
 
-    nminseq = 50 # Num min seqs before removing allele
-    nminseqMS = 300 # Num min seqs before switching to all MS 
-    nminseqAL = 300 # Num min seqs before switching to all techs
-    NSmin = 10
+nminseq = 50 # Num min seqs before removing allele
+nminseqMS = 300 # Num min seqs before switching to all MS 
+nminseqAL = 300 # Num min seqs before switching to all techs
+NSmin = 10
 
-    if yesreal:
-        nminseq = 5 
-        nminseqMS = 30
-        nminseqAL = 30
+if yesreal:
+    nminseq = 5 
+    nminseqMS = 30
+    nminseqAL = 30
 
-    # Estimate Frequencies in different sets for reweighting factor: background frequency is obtained following Bassani-Sternberg et al. PLoS Comput. Biol. 2017
-
-    if makereweighting:
-        condition4 = iedb['MHC'].isin(['HLA-A*02:01', 'HLA-A*02:05', 'HLA-A*02:06', 'HLA-A*02:20', 'HLA-A*25:01', 'HLA-A*26:01','HLA-A*29:02', 'HLA-B*08:01', 'HLA-B*14:01', 'HLA-B*14:02', 'HLA-C*03:03', 'HLA-C*07:04'])
-        # exclude alleles that have specificity at P4-P7
-        # select ms
-        iedb_selms = iedb[condition0 & condition1 & condition2 & condition3 & condition5 & ~condition4]
-        # select nms
-        iedb_selnms = iedb[condition0 & condition1 & condition2 & condition3 & ~condition5]
-        # Find the HLAs in common - to guarantee that one is correcting for the bias in the technique not in the composition
-        hla_corr = overlap_seqs(list(np.unique(iedb_selms['MHC'].values)), list(np.unique(iedb_selnms['MHC'].values)))
-        # narrow them down to the hlas that have at least 100 seqs in each subset - MS and NON-MS
-        hla_corr_100ms = []
-        for u in range(len(hla_corr)):
-            iedb_sel0 = iedb_selms[iedb_selms['MHC'] == hla_corr[u]]
-            if len((iedb_sel0.values)[:,index_antigen]) >= 100:
-                hla_corr_100ms.append(hla_corr[u])
-
-        hla_corr_100nms = []
-        for u in range(len(hla_corr)):
-            iedb_sel0 = iedb_selnms[iedb_selnms['MHC'] == hla_corr[u]]
-            if len((iedb_sel0.values)[:,index_antigen]) >= 100:
-                hla_corr_100nms.append(hla_corr[u])
-
-        # finally take overlap
-        hla_corr_fin = overlap_seqs(hla_corr_100ms, hla_corr_100nms)
-        iedb_ms = iedb_selms[iedb_selms['MHC'].isin(hla_corr_fin)]
-        iedb_nms = iedb_selnms[iedb_selnms['MHC'].isin(hla_corr_fin)]
-
-        seqs_ms = (iedb_ms.values)[:, index_antigen]
-        seqs_msL = [a for a in seqs_ms if len(a)==9 and 'X' not in a and 'Z' not in a] 
-
-        # 9-mers only, to have clear identification of non-anchor sites
-        list_counts_aa = []
-        for a in aa:
-            countaa = 0
-            totL = 0
-            for ss in range(len(seqs_msL)): # Limit to non-anchor positions
-                s = ''.join(list(seqs_msL[ss][3:7]))
-                totL += len(s)
-                if a in s:
-                    countaa += s.count(a)
-            list_counts_aa.append(countaa)
-        aafreq_ms = [float(list_counts_aa[t])/float(totL) for t in range(len(aa)-1)]
-        aafreq_ms.append(0.05) # add a uniform-distribution value for the gap
-
-        if args.rwnms:
-        # Find frequencies of non-MS data
-            seqs_nms = (iedb_nms.values)[:, index_antigen]
-            seqs_nmsL = [a for a in seqs_nms if len(a) == 9 and 'X' not in a and 'Z' not in a] 
-
-            list_counts_aa = []
-            for a in aa:
-                countaa = 0
-                totL = 0
-                for ss in range(len(seqs_nmsL)): # Limit estimation to non-anchor positions
-                    s = ''.join(list(seqs_nmsL[ss][3:7]))
-                    totL += len(s)
-                    if a in s:
-                        countaa += s.count(a)
-                list_counts_aa.append(countaa)
-
-            aafreq_nms = [float(list_counts_aa[t])/(totL) for t in range(len(aa)-1)]
-
-        if args.rwhp:
-            aafreq_nms = [0.06973193229784201, 0.022227300211810606, 0.04776998270837931, 0.07077023506787744, 0.035831258011111006, 0.06569891873175196, 0.026058299821958418, 0.04291157865732822, 0.056774727153814875, 0.09904393617954255, 0.02195800091948729, 0.03549834564548375, 0.06341291522288485, 0.0477736944581562, 0.05668205186949188, 0.0842078354011136, 0.054770500734393386, 0.059924778626702334, 0.012472466417845177, 0.026161320621617003]
-
-        aafreq_nms.append(0.05)
 
 # Parameters re-alignment
 mex = 1 #exp HMM score for weighting alignment score
 yw = 1 #re-weights seqs in building profile
 dth = 0 # threshold in decoder probability for re-weighting step
+
+pseudocount = 0.000001
+
+# Estimate Frequencies in different sets for reweighting factor: background frequency is obtained following Bassani-Sternberg et al. PLoS Comput. Biol. 2017
+
+if makereweighting:
+    condition4 = iedb['MHC'].isin(['HLA-A*02:01', 'HLA-A*02:05', 'HLA-A*02:06', 'HLA-A*02:20', 'HLA-A*25:01', 'HLA-A*26:01','HLA-A*29:02', 'HLA-B*08:01', 'HLA-B*14:01', 'HLA-B*14:02', 'HLA-C*03:03', 'HLA-C*07:04'])
+    # exclude alleles that have specificity at P4-P7
+    # select ms
+    iedb_selms = iedb[condition0 & condition1 & condition2 & condition3 & condition5 & ~condition4]
+    # select nms
+    iedb_selnms = iedb[condition0 & condition1 & condition2 & condition3 & ~condition5]
+    # Find the HLAs in common - to guarantee that one is correcting for the bias in the technique not in the composition
+    hla_corr = overlap_seqs(list(np.unique(iedb_selms['MHC'].values)), list(np.unique(iedb_selnms['MHC'].values)))
+    # narrow them down to the hlas that have at least 100 seqs in each subset - MS and NON-MS
+    hla_corr_100ms = []
+    for u in range(len(hla_corr)):
+        iedb_sel0 = iedb_selms[iedb_selms['MHC'] == hla_corr[u]]
+        if len((iedb_sel0.values)[:,index_antigen]) >= 100:
+            hla_corr_100ms.append(hla_corr[u])
+
+    hla_corr_100nms = []
+    for u in range(len(hla_corr)):
+        iedb_sel0 = iedb_selnms[iedb_selnms['MHC'] == hla_corr[u]]
+        if len((iedb_sel0.values)[:,index_antigen]) >= 100:
+            hla_corr_100nms.append(hla_corr[u])
+
+    # finally take overlap
+    hla_corr_fin = overlap_seqs(hla_corr_100ms, hla_corr_100nms)
+    iedb_ms = iedb_selms[iedb_selms['MHC'].isin(hla_corr_fin)]
+    iedb_nms = iedb_selnms[iedb_selnms['MHC'].isin(hla_corr_fin)]
+
+    seqs_ms = (iedb_ms.values)[:, index_antigen]
+    seqs_msL = [a for a in seqs_ms if len(a)==9 and 'X' not in a and 'Z' not in a] 
+
+    # 9-mers only, to have clear identification of non-anchor sites
+    list_counts_aa = []
+    for a in aa:
+        countaa = 0
+        totL = 0
+        for ss in range(len(seqs_msL)): # Limit to non-anchor positions
+            s = ''.join(list(seqs_msL[ss][3:7]))
+            totL += len(s)
+            if a in s:
+                countaa += s.count(a)
+        list_counts_aa.append(countaa)
+    aafreq_ms = [float(list_counts_aa[t])/float(totL) for t in range(len(aa)-1)]
+    aafreq_ms.append(0.05) # add a uniform-distribution value for the gap
+
+    if args.rwnms:
+    # Find frequencies of non-MS data
+        seqs_nms = (iedb_nms.values)[:, index_antigen]
+        seqs_nmsL = [a for a in seqs_nms if len(a) == 9 and 'X' not in a and 'Z' not in a] 
+
+        list_counts_aa = []
+        for a in aa:
+            countaa = 0
+            totL = 0
+            for ss in range(len(seqs_nmsL)): # Limit estimation to non-anchor positions
+                s = ''.join(list(seqs_nmsL[ss][3:7]))
+                totL += len(s)
+                if a in s:
+                    countaa += s.count(a)
+            list_counts_aa.append(countaa)
+
+        aafreq_nms = [float(list_counts_aa[t])/(totL) for t in range(len(aa)-1)]
+
+    if args.rwhp:
+        aafreq_nms = [0.06973193229784201, 0.022227300211810606, 0.04776998270837931, 0.07077023506787744, 0.035831258011111006, 0.06569891873175196, 0.026058299821958418, 0.04291157865732822, 0.056774727153814875, 0.09904393617954255, 0.02195800091948729, 0.03549834564548375, 0.06341291522288485, 0.0477736944581562, 0.05668205186949188, 0.0842078354011136, 0.054770500734393386, 0.059924778626702334, 0.012472466417845177, 0.026161320621617003]
+
+    aafreq_nms.append(0.05)
 
 # Re-adjust options
 if LL == 1:
@@ -468,7 +484,7 @@ if os.path.exists(out_fold) is False:
     os.mkdir(out_fold)
 
 if args.nameo is None:
-   out_par = 'YesReal_' + str(yesreal) + '_hu_' + str(hu) + '_l12' + str(l12) + '_AL' + str(np.mean(range_len)) + '_SA' + str(SA) + '_RW' + strw + '_TR' + str(deg)
+   out_par = 'YesReal_' + str(yesreal) + '_hu_' + str(hu) + '_l12' + str(l12) + '_AL' + str(np.mean(range_len)) + '_SA' + str(SA) + '_RW' + strw + '_TR' + str(deg) + '_' + str(nminseqMS)
 else:
    out_par = args.nameo
 
@@ -476,19 +492,7 @@ else:
 ## name of a log file ##
 log_file = out_fold + '/Log_' + out_par + '.txt' 
 
-
-if nc == 1 and yesreal == 1:
-    filename = out_fold + '/' + args.i + '.txt'
-    iedb_data_fl = []
-    with open(filename) as f:
-        for line in f:
-            linesplit = line.strip().split('\t')
-            nogap1=linesplit[0].replace(' ','')
-            if len(nogap1) in range_len:
-                iedb_data_fl.append(nogap1)
-    ## here if given_labels: iedb_ind_tr ##
-
-else:
+if nc != 1 and yesreal != 1:
     iedb_data_T = [] # _T temporary variables
     iedb_cat_T = []
     iedb_qua_T = []
@@ -498,7 +502,6 @@ else:
             l = lcou
         condition4 = iedb['MHC'] == list_hla_l[l]
         if args.ba == 1:
-
             iedb1 = iedb[~(c_ex11 & c_ex12)]
             iedb2= iedb1[~(c_ex21 & c_ex22)]
             iedb3= iedb2[~(c_ex31 & c_ex32)]
@@ -518,7 +521,6 @@ else:
                f.close()
         else:
             iedb_hla_pos = iedb[condition0 & condition1 & condition2 & condition3 & condition4 & condition5 & condition_mon]
-          #  iedb_hla_pos = iedb[condition0 & condition1 & condition2 & condition3 & condition4 & condition5]
             size_nc.append(len(iedb_hla_pos))
             an_chla = (iedb_hla_pos.values)[:,index_antigen]
             f = open(log_file,'a+')
@@ -611,7 +613,6 @@ else:
         list_u = Rand(0,(len(iedb_data_T[l])-1), int(round(deg*len(iedb_data_T[l]))))
         for u in list_u:
             if iedb_data_T[l][u] not in listd and iedb_data_T[l][u] not in list_other:
-           # if iedb_data_T[l][u] not in listd:
                 listd.append(iedb_data_T[l][u])
                 listc.append(iedb_cat_T[l][u])
                 listq.append(iedb_qua_T[l][u])
@@ -627,52 +628,52 @@ else:
                 count_val+=1
 
         iedb_data.append(listd)
+        if SA not in [len(s) for s in listd]:
+            aux_str = ''.join(['A' for i in range(SA)])
+            T=len(listd)
+            listd.append(aux_str) 
+
+            if LL == 1:
+                temp_nn = convert_number(listd)
+            else: 
+                name_mat = rootf + '/Align_utils/align_seqpy.py'
+                name_seqs = rootf + '/Align_utils/seqs_str.txt'
+                with open(name_seqs, 'w') as out_f:
+                    for u in range(len(listd)):
+                        out_f.write(listd[u] + '\n')
+
+                subprocess.call('python3 -W ignore ' + name_mat +' -ss ' + name_seqs + ' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax), shell=True)
+                name_al = rootf + '/Align_utils/aligned_temp.txt'
+                temp_nn = np.loadtxt(name_al)
+                subprocess.call('rm ' + name_seqs, shell=True)
+                subprocess.call('rm ' + name_al, shell=True)
+
+            an_chla9_n = np.copy(temp_nn[0:T])
+        else:
+            if LL == 1:
+                an_chla9_n = convert_number(listd)
+            else: 
+                name_mat = rootf + '/Align_utils/align_seqpy.py'
+                name_seqs = rootf + '/Align_utils/seqs_str.txt'
+                with open(name_seqs, 'w') as out_f:
+                    for u in range(len(listd)):
+                        out_f.write(listd[u] + '\n')
+                subprocess.call('python3 -W ignore ' + name_mat +' -ss ' + name_seqs + ' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax), shell=True)
+                name_al = rootf + '/Align_utils/aligned_temp.txt'
+                an_chla9_n = np.loadtxt(name_al)
+                subprocess.call('rm ' + name_seqs, shell=True)
+                subprocess.call('rm ' + name_al, shell=True)
+
+        pwm = average_n(an_chla9_n.astype(np.int16), CC)
         f = open(log_file,'a+')
         f.write('Final data ' + list_hla_l[l] + ' = ' + str(len(listd)) + ' for average length ' + str(np.mean(range_len)) + '\n')
         f.close()
+        pwm_refA.append(pwm) # alignment allotype by allotype
+
+        stringt  = list_hla_l[l] + ' # seqs ' + str(len(iedb_data[l]))
+        fig = sequence_logo.Sequence_logo(pwm, figsize=(15,3), ylabel= 'bits', title = stringt, show=True, ticks_every=5, ticks_labels_size=20, title_size=24);
+
         if makefig: 
-            if SA not in [len(s) for s in listd]:
-                aux_str = ''.join(['A' for i in range(SA)])
-                T=len(listd)
-                listd.append(aux_str) 
-
-                if LL == 1:
-                    temp_nn = convert_number(listd)
-                else: 
-                    name_mat = rootf + '/Align_utils/align_seqpy.py'
-                    name_seqs = rootf + '/Align_utils/seqs_str.txt'
-                    with open(name_seqs, 'w') as out_f:
-                        for u in range(len(listd)):
-                            out_f.write(listd[u] + '\n')
-
-                    subprocess.call('python3 -W ignore ' + name_mat +' -ss ' + name_seqs + ' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax), shell=True)
-                    name_al = rootf + '/Align_utils/aligned_temp.txt'
-                    temp_nn = np.loadtxt(name_al)
-                    subprocess.call('rm ' + name_seqs, shell=True)
-                    subprocess.call('rm ' + name_al, shell=True)
-
-                an_chla9_n = np.copy(temp_nn[0:T])
-            else:
-                if LL == 1:
-                    an_chla9_n = convert_number(listd)
-                else: 
-                    name_mat = rootf + '/Align_utils/align_seqpy.py'
-                    name_seqs = rootf + '/Align_utils/seqs_str.txt'
-                    with open(name_seqs, 'w') as out_f:
-                        for u in range(len(listd)):
-                            out_f.write(listd[u] + '\n')
-                    subprocess.call('python3 -W ignore ' + name_mat +' -ss ' + name_seqs + ' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax), shell=True)
-                    name_al = rootf + '/Align_utils/aligned_temp.txt'
-                    an_chla9_n = np.loadtxt(name_al)
-                    subprocess.call('rm ' + name_seqs, shell=True)
-                    subprocess.call('rm ' + name_al, shell=True)
-
-            pwm = average_n(an_chla9_n.astype(np.int16), CC)
-            pwm_refA.append(pwm) # alignment allotype by allotype
-
-            stringt  = list_hla_l[l] + ' # seqs ' + str(len(iedb_data[l]))
-            fig = sequence_logo.Sequence_logo(pwm, figsize=(15,3), ylabel= 'bits', title = stringt, show=True, ticks_every=5, ticks_labels_size=20, title_size=24);
-
             pwm_ng = average_n(an_chla9_n.astype(np.int16), CC)
             fig = sequence_logo.Sequence_logo(pwm_ng, figsize=(15,3), ylabel= 'bits', title = stringt, show=True, ticks_every=5, ticks_labels_size=20, title_size=24);
             pathfig = out_fold + '/IEDB_allotype_' + str(l) + '_AL' + str(np.mean(range_len)) + '_SA' + str(SA) + '.pdf'
@@ -686,8 +687,6 @@ else:
         iedb_cat_val.append(listc_val)
         iedb_qua_val.append(listq_val)
         iedb_ind_V.append(listi_val)
-
-    pwm_random = float(1)/float(CC)*np.ones((SA,CC))
 
     iedb_data_fl = flatten_list(iedb_data)
     iedb_cat_fl = flatten_list(iedb_cat)
@@ -717,37 +716,23 @@ else:
             listi = []
             ncli = float(1)/nc
             fullperc= (float(ncli))*perc
-            limit = round(len(ms_seqs)*fullperc) # amount if labelled data == perc*size dataset
+            limit = round(len(ms_seqs)*fullperc)
             if len(iedb_ind[l])>limit:
-                for p in range(len(iedb_ind[l])):
-                    cond_qua = (iedb_qua_fl[iedb_ind[l][p]] == quality_pos[0] or iedb_qua_fl[iedb_ind[l][p]] == quality_pos[1])
-                    if iedb_data_fl[iedb_ind[l][p]] in ms_seqs and cond_qua:
-                        listi.append(iedb_ind[l][p])
+                for t in range(10000):
+                    r = np.copy(random.randint(0,len(iedb_ind[l])-1))
+                    if iedb_qua_fl[iedb_ind[l][r]] == quality_pos[0] or iedb_qua_fl[iedb_ind[l][r]] == quality_pos[1] and iedb_data_fl[iedb_ind[l][r]] not in ms_seqs:
+                        listi.append(iedb_ind[l][r])
                     if len(list(np.unique(listi))) > limit:
-                            break
-                if len(list(np.unique(listi))) < limit:
-                    for t in range(10000):
-                        r = np.copy(random.randint(0,len(iedb_ind[l])-1))
-                        if iedb_qua_fl[iedb_ind[l][r]] == quality_pos[0] or iedb_qua_fl[iedb_ind[l][r]] == quality_pos[1]:
-                            listi.append(iedb_ind[l][r])
-                        if len(list(np.unique(listi))) > limit:
-                            break
+                        break
             else:
                 limit = len(iedb_ind[l])-2
-                for p in range(len(iedb_ind[l])):
-                    cond_qua = (iedb_qua_fl[iedb_ind[l][p]] == quality_pos[0] or iedb_qua_fl[iedb_ind[l][p]] == quality_pos[1])
-                    if iedb_data_fl[iedb_ind[l][p]] in ms_seqs and cond_qua:
-                        listi.append(iedb_ind[l][p])
+                for t in range(10000):
+                    r = np.copy(random.randint(0,len(iedb_ind[l])-1))
+                    listi.append(iedb_ind[l][r])
                     if len(list(np.unique(listi))) > limit:
-                            break
-                if len(list(np.unique(listi))) < limit:
-                    for t in range(10000):
-                        r = np.copy(random.randint(0,len(iedb_ind[l])-1))
-                        listi.append(iedb_ind[l][r])
-                        if len(list(np.unique(listi))) > limit:
-                            break
+                        break
             iedb_ind_tr.append(list(np.unique(listi)))
-                     
+                 
     else: 
         iedb_ind_tr=[]
         for l in range(len(iedb_ind)):
@@ -755,7 +740,6 @@ else:
             ncli = float(1)/nc
             fullperc = (float(ncli))*perc
             limit = round(len(iedb_data_fl)*fullperc)
-            #limit = round(len(iedb_ind[l])*perc)
             if limit > NSmin:
                 for t in range(10000):
                     r = np.copy(random.randint(0,len(iedb_ind[l])-1))
@@ -786,12 +770,13 @@ else:
         full_cat = []
         len_tr = 0
         for c in range(nc):
-              full_data.append([iedb_data_fl[iedb_ind_tr[c][u]] for u in range(len(iedb_ind_tr[c]))])
-              full_cat.append([iedb_cat_fl[iedb_ind_tr[c][u]] for u in range(len(iedb_ind_tr[c]))])                    
-              
+            full_data.append([iedb_data_fl[iedb_ind_tr[c][u]] for u in range(len(iedb_ind_tr[c]))])
+            print(len(iedb_ind_tr[c]))
+            full_cat.append([iedb_cat_fl[iedb_ind_tr[c][u]] for u in range(len(iedb_ind_tr[c]))])                    
+          
         for c in range(nc):    
-              full_ind_tr.append([u for u in range(len_tr, len_tr + len(iedb_ind_tr[c]))])
-              len_tr += len(iedb_ind_tr[c]) 
+            full_ind_tr.append([u for u in range(len_tr, len_tr + len(iedb_ind_tr[c]))])
+            len_tr += len(iedb_ind_tr[c]) 
         ms_seqadd=[ms_seqs[ns] for ns in range(len(ms_seqs)) if ms_seqs[ns] not in flatten_list(full_data)]
         full_data.append(ms_seqadd)
 
@@ -815,24 +800,24 @@ else:
     for cl in range(nc):
         temp_msa = [iedb_data_fl[i] for i in iedb_ind_tr[cl]]
         if SA not in [len(s) for s in temp_msa]:
-              aux_str = ''.join(['A' for i in range(SA)])
-              T = len(temp_msa)
-              temp_msa.append(aux_str)
-              if LL == 1:
+            aux_str = ''.join(['A' for i in range(SA)])
+            T = len(temp_msa)
+            temp_msa.append(aux_str)
+            if LL == 1:
                 temp_nn = convert_number(temp_msa)
-              else: 
+            else: 
                 name_mat = rootf + '/Align_utils/align_seqpy.py'
                 name_seqs = rootf + '/Align_utils/seqs_str.txt'
                 with open(name_seqs, 'w') as out_f:
                     for u in range(len(temp_msa)):
                         out_f.write(temp_msa[u] + '\n')    
-                                          
+                                      
                 subprocess.call('python3 -W ignore ' + name_mat +' -ss ' + name_seqs + ' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax), shell=True)
                 name_al = rootf + '/Align_utils/aligned_temp.txt'
                 temp_nn = np.loadtxt(name_al)
                 subprocess.call('rm ' + name_seqs, shell=True)
                 subprocess.call('rm ' + name_al, shell=True)
-              seqs_n = np.copy(temp_nn[0:T])
+            seqs_n = np.copy(temp_nn[0:T])
         else:
             if LL == 1:
                 seqs_n = convert_number(temp_msa)
@@ -858,11 +843,21 @@ else:
             with open(name_fi  + '.txt', 'w') as out_f:
                 for r in range(len(iedb_ind_tr[cl])):
                     out_f.write(iedb_data_fl[iedb_ind_tr[cl][r]] + '\n')
-   
+
 
 pwm_random = float(1)/float(CC)*np.ones((SA,CC))
 
 # Train a RBM: datatset
+if nc == 1 and yesreal == 1:
+    filename = out_fold + '/' + args.i + '.txt'
+    iedb_data_fl = []
+    with open(filename) as f:
+        for line in f:
+            linesplit = line.strip().split('\t')
+            nogap1=linesplit[0].replace(' ','')
+            if len(nogap1) in range_len:
+                iedb_data_fl.append(nogap1)
+
 temp_msa = list(iedb_data_fl)
 
 # alignment of the dataset:
@@ -1349,7 +1344,7 @@ for runs in range(Nrun):
  
         iedb_data_fl_g = convert_letter(iedb_data_fl_nf)
         CLlist = zip(iedb_data_fl,iedb_data_fl_g, labels_tr, labels_rbm)
-        CLstr = 'Data' + '\t'+ 'Data Core' + '\t'+ 'Training' + '\t' + 'ssRBM label' 
+        CLstr = 'Data' + '\t'+ 'Data Core' + '\t'+ 'TR' + '\t' + 'RBM' 
         fold_real = out_fold + '/' + args.i + '_classification_' +  out_par + '.txt'
         with open(fold_real, 'w') as out_f:
             out_f.write(CLstr + '\n')
