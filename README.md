@@ -3,7 +3,18 @@
 Python3 script to implement the ssRBM (semi-supervised RBM) architecture described in Bravi et al. 2020: a method to predict antigen presentation and for HLA-I motif deconvolution 
 
 ## Copyright ##
+Copyright 2020 - by Barbara Bravi (bbravi.bb@gmail.com)
+All rights reserved
+     
+Permission is granted for anyone to copy, use, or modify this
+software for any uncommercial purposes, provided this copyright 
+notice is retained, and note is made of any changes that have 
+been made. This software is distributed without any warranty, 
+express or implied. In no event shall the author or contributors be 
+liable for any damage arising out of the use of this software.
 
+The publication of research using this software, modified or not, must include 
+appropriate citations to:
 
 ## Download and Install the packages ## 
 
@@ -19,15 +30,14 @@ The path to this folder should be  specified inside setup.py (assigned to NAME_F
 python3 setup.py
 
 
-Create or download in the same folder the file containing antigen sequences annotated by their HLA-specificity to guide motif deconvolution in the supervised 
-learning step. The current implementation searches annotated ligands in the file mhc_ligand_full.csv from the Immune Epitope Database downloadable here:
+Create or download in the same folder the file containing antigen sequences annotated by their HLA-specificity to guide motif deconvolution in the supervised learning step. The current implementation searches annotated ligands in the file mhc_ligand_full.csv from the Immune Epitope Database downloadable here:
 http://www.iedb.org/database_export_v3.php
 
 
 ## Run the script ##
 
 To run the script, an example command line is: 
-python3 ssRBM.py -hla 'HLA-A*01:01' 'HLA-A*02:01' 'HLA-B*15:01' 'HLA-B*27:02' 'HLA-C*08:02' 'HLA-C*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder' -nameo 'string_output'
+python3 ssRBM.py -hla 'HLA-A\*01:01' 'HLA-A*02:01' 'HLA-B*15:01' 'HLA-B*27:02' 'HLA-C*08:02' 'HLA-C*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder' -nameo 'string_output'
 
 This command line reads the peptides of length 9-10 residues from the file NAME_FOLDER/output_folder/sample_file.txt, trains a RBM on them and deconvolves the peptides specifically binding to HLA-A*01:01, HLA-A*02:01, HLA-B*15:01, HLA-B*27:02, HLA-C*08:02, HLA-C*16:01 (HLA alleles expressed in the sample known from HLA typing). The deconvolution is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The output (trained RBM, trained classifier, table of peptides with assigned specificity) is saved in NAME_FOLDER/output_folder. 
 
