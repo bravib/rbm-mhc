@@ -1,6 +1,6 @@
 ## ssRBM Python3 script ##
 
-Python3 script to implement the ssRBM (semi-supervised RBM) architecture described in Bravi et al. 2020: a method to predict antigen presentation and for HLA-I motif deconvolution 
+Python3 script to implement RBM-MHC, a Restricted Boltzmann Machine (RBM)-based method described in Bravi et al. 2020 to predict antigen presentation and for HLA-I motif deconvolution 
 
 ## Copyright ##
 Copyright 2020 - by Barbara Bravi (bbravi.bb@gmail.com)
@@ -15,29 +15,27 @@ liable for any damage arising out of the use of this software.
 
 The publication of research using this software, modified or not, must include 
 appropriate citations to:
+...
 
 ## Download and Install the packages ## 
 
-ssRBM is written in Python version 3.6.9
+RBM-MHC is written in Python version 3.6.9
 
-Packages required: biopython, numba, keras (with Theano or tensorFlow backend), scikit-learn, along with standard packages (numpy, cython, matplotlib).
-The alignment routines require matlab and matlab engine API for Python https://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
+Packages required: biopython, numba, keras (with Theano or tensorFlow backend), scikit-learn, along with standard packages (numpy, cython, matplotlib). The alignment routines require matlab and matlab engine API for Python https://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 
-
-The ssRBM script , the folder Align_utils and the package PGM3 (RBM implementation in Python3 by Jerome Tubiana, see ...) should be saved in the same folder. 
-The path to this folder should be  specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
+The RBM-MHC.py script, the folder Align_utils and the package PGM3 (RBM implementation in Python3 by Jerome Tubiana, see ...) should be saved in the same folder. The path to this folder should be  specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
 
 python3 setup.py
 
-
-Create or download in the same folder the file containing antigen sequences annotated by their HLA-specificity to guide motif deconvolution in the supervised learning step. The current implementation searches annotated ligands in the file mhc_ligand_full.csv from the Immune Epitope Database downloadable here:
+Antigen sequences annotated by their HLA-binding specificity are used to guide motif reconstruction. The current implementation searches annotated ligands in the file mhc_ligand_full.csv from the Immune Epitope Database downloadable here:
 http://www.iedb.org/database_export_v3.php
 
 
 ## Run the script ##
 
 To run the script, an example command line is: 
-python3 ssRBM.py -hla 'HLA-A\*01:01' 'HLA-A*02:01' 'HLA-B*15:01' 'HLA-B*27:02' 'HLA-C*08:02' 'HLA-C*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder' -nameo 'string_output'
+
+python3 RBM-MHC.py -hla 'HLA-A\*01:01' 'HLA-A*02:01' 'HLA-B*15:01' 'HLA-B*27:02' 'HLA-C*08:02' 'HLA-C*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder' -nameo 'string_output'
 
 This command line reads the peptides of length 9-10 residues from the file NAME_FOLDER/output_folder/sample_file.txt, trains a RBM on them and deconvolves the peptides specifically binding to HLA-A*01:01, HLA-A*02:01, HLA-B*15:01, HLA-B*27:02, HLA-C*08:02, HLA-C*16:01 (HLA alleles expressed in the sample known from HLA typing). The deconvolution is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The output (trained RBM, trained classifier, table of peptides with assigned specificity) is saved in NAME_FOLDER/output_folder. 
 
