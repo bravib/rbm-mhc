@@ -23,7 +23,7 @@ RBM-MHC is written in Python version 3.6.9
 
 Packages required: biopython, numba, keras (with Theano or tensorFlow backend), scikit-learn, along with standard packages (numpy, cython, matplotlib). The alignment routines require matlab and matlab engine API for Python https://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 
-The RBM-MHC.py script, the folder Align_utils and the package PGM3 (RBM implementation in Python3 by Jerome Tubiana, see ...) should be saved in the same folder. The path to this folder should be  specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
+The RBM-MHC.py script, the folder Align_utils and the package PGM3 (RBM implementation by Jerome Tubiana, see Tubiana et al. eLife 2019) should be saved in the same folder. The path to this folder should be  specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
 
 python3 setup.py
 
@@ -32,18 +32,20 @@ http://www.iedb.org/database_export_v3.php
 
 
 ## Run the script ##
+We assume to have a custom dataset, e.g. a dataset of unannotated peptides from an elution experiment saved in sample_file.txt and the HLA-I known to be expressed in the sample, e.g. from HLA-typing, are HLA-A\*01:01, HLA-A\*02:01, HLA-B\*15:01, HLA-B\*27:02, HLA-C\*08:02, HLA-C\*16:01. Running the RBM-MHC script allows to build a presentation model able to: 
+- assign an HLA-I type to each peptide in sample_file.txt;
+- assign presentation scores to a custom list of peptides, e.g. all peptides harbouring cancer-specific mutations (see option -score), to understand what have high likelihood of being presented.
 
 To run the script, an example command line is: 
 
-python3 RBM-MHC.py -hla 'HLA-A\*01:01' 'HLA-A*02:01' 'HLA-B*15:01' 'HLA-B*27:02' 'HLA-C*08:02' 'HLA-C*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder' -nameo 'string_output'
+python3 RBM-MHC.py -hla 'HLA-A\*01:01' 'HLA-A\*02:01' 'HLA-B\*15:01' 'HLA-B\*27:02' 'HLA-C\*08:02' 'HLA-C\*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder' -nameo 'string_output'
 
-This command line reads the peptides of length 9-10 residues from the file NAME_FOLDER/output_folder/sample_file.txt, trains a RBM on them and deconvolves the peptides specifically binding to HLA-A*01:01, HLA-A*02:01, HLA-B*15:01, HLA-B*27:02, HLA-C*08:02, HLA-C*16:01 (HLA alleles expressed in the sample known from HLA typing). The deconvolution is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The output (trained RBM, trained classifier, table of peptides with assigned specificity) is saved in NAME_FOLDER/output_folder. 
+This command line reads the peptides of length 9-10 residues from the file NAME_FOLDER/output_folder/sample_file.txt, trains RBM-MHC on them and predicts the peptides specifically binding to the 6 HLA-I provided. The HLA assignment is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The output (trained RBM and HLA-I classifier, table of peptides with assigned HLA-binding specificity) is saved in NAME_FOLDER/output_folder. 
 
 
-Options: 
+## Options ##
 
--hla : list of HLA-I alleles characterizing the sample to analyze or, if a sample is not provided, for which data on IEDB should be searched; if for a given sample 
-this option is not provided, only a RBM is trained and RBM presentation scores are assigned to the peptides in the file provided by the -score option
+-hla : list of HLA-I alleles characterizing the sample to analyze or, if a sample is not provided, for which data on IEDB should be searched; if for a given sample this option is not provided, only a RBM is trained and RBM presentation scores are assigned to the peptides in the file provided by the -score option
 
 -i : Name of the input file with peptide sequences to analyze, saved in format .txt inside the main folder (NAME_FOLDER)
 
@@ -69,9 +71,11 @@ this option is not provided, only a RBM is trained and RBM presentation scores a
 
 -al : When set to 0, it disables the re-iteration of the alignment after classification (default = 1)
 
--rwnms : When set to 0, it implements the re-weighting scheme to correct for differences between amino acid frequencies of antigens detected by Mass Spectrometry and by other techniques (default = 0)
+-ba : When set to 1, the search in IEDB for peptides of known HLA type is performed among data from binding assays (default = 0)
 
--rwhp :  When set to 0, it implements the re-weighting scheme to correct for differences between amino acid frequencies of antigens detected by Mass Spectrometry and the human proteome (default = 0)
+-rwnms : When set to 1, it implements the re-weighting scheme to correct for differences between amino acid frequencies of antigens detected by Mass Spectrometry and by other techniques (default = 0)
+
+-rwhp :  When set to 1, it implements the re-weighting scheme to correct for differences between amino acid frequencies of antigens detected by Mass Spectrometry and the human proteome (default = 0)
 
 -score : Name of the file inside the output folder with the list of peptides to score (as peptides containing missense mutations from Whole Exome Sequencing of a tumour sample); the list of peptides and corresponding scores is saved in a subfolder 'scoring' (default = 0)
 
@@ -79,9 +83,7 @@ this option is not provided, only a RBM is trained and RBM presentation scores a
 
 -fig : It prints motif figures (default = 0)
 
-
 ## Data retrieval from Immune Epitope Database ###
 
-To guide motif deconvolution in samples of interest for the user, ssRBM routine seeks in IEDB (vita 2019) a given amount of 
-peptides labelled with the HLA-specificities expected in the sample. The search first targets monoallelic source data as described above. If less than a given amount of sequences (set by default to 300) are retrieved, the search is first extended to ``Allele Specific Purification'' MS-data, next, if the latter are not available, to all MS-data, next to data obtained by all techniques (thus e.g.\ by binding affinity assays). Regardless of the technique, this labelled set of sequences is chosen among ligands annotated as ``positive'', ``positive-high'' to the HLA-I alleles under consideration.
+To guide motif reconstruction in samples of interest for the user, RBM-MHC uses an amount of peptides equal to perc x sample size labelled with their HLA association. The current routine seeks an overlap between the sample and IEDB in such a way that these peptides can be assigned a known HLA preference. If there is little overlap, it adds labelled peptides from IEDB. The search first targets monoallelic source data as described in the paper. If less than a given amount of sequences (set by default to 300) are retrieved, the search is first extended to 'Allele Specific Purification' mass spectrometry (MS) data, next, if the latter are not available, to all MS-data, next to data obtained by all techniques (thus e.g. by binding affinity assays). Regardless of the technique, this labelled set of sequences is chosen among ligands annotated as 'positive', 'positive-high' to the HLA-I alleles under consideration. By the option -ba the search for labelled peptides can be instead performed in IEDB data from binding assays. 
 
