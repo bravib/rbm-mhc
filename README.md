@@ -1,4 +1,4 @@
-## ssRBM Python3 script ##
+## RBM-MHC Python3 script ##
 
 Python3 script to implement RBM-MHC, a Restricted Boltzmann Machine (RBM)-based method described in Bravi et al. 2020 to predict antigen presentation and for HLA-I motif deconvolution 
 
