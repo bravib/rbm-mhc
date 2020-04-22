@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('-hla', nargs = '+', type = str, required= False, help='HLA-I alleles') # For custom dataset, if not given, only scoring by RBM is performed; For IEDB dataset, if not given, it is set to 'Haplotype1'
 parser.add_argument('-i', type = str, required=False, help='Name of input file (with peptide sequences)') # if not given, IEDB sequences are used
-parser.add_argument('-o', type = str, required=False, help='Name of output folder') # Required for custom datasets. If not given, it is set to 'IEDB_out_Haplotype1' - see folders available at https://github.com/bravib/ssrbm
+parser.add_argument('-o', type = str, required=False, help='Name of output folder') # Required for custom datasets. If not given, it is set to 'IEDB_out_Haplotype1' - see data folders available at https://github.com/bravib/ssrbm
 parser.add_argument('-nameo', type = str, required=False, help='String to appear in file names')
 parser.add_argument('-rl', nargs = '+', type = int, required=False, help='Range of peptide lengths') # if not given, it is set to 8,9,10,11
 parser.add_argument('-mt', type = int, required=False, default = 1, help='0 disables training of the method and reads an existing model')
