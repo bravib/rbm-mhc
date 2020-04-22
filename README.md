@@ -30,7 +30,6 @@ python3 setup.py
 Antigen sequences annotated by their HLA-binding specificity are used to guide motif reconstruction. The current implementation searches annotated ligands in the file mhc_ligand_full.csv from the Immune Epitope Database downloadable here:
 http://www.iedb.org/database_export_v3.php
 
-
 ## Run the script ##
 We assume to have a custom dataset, e.g. a dataset of unannotated peptides from an elution experiment saved in sample_file.txt, and the HLA-I known to be expressed in the sample, e.g. from HLA-typing, are HLA-A\*01:01, HLA-A\*03:01, HLA-B\*07:02, HLA-B\*08:01, HLA-C\*07:02, HLA-C\*07:01. Running the RBM-MHC script allows to build a presentation model able to: 
 - assign an HLA-I type to each peptide in sample_file.txt;

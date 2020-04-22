@@ -1,4 +1,4 @@
-
+rootf='/home/barbara/Barbara_Bravi/rbm-mhc'
 
 import argparse
 parser = argparse.ArgumentParser() 
@@ -321,8 +321,8 @@ pseudocount = 0.000001
 # import IEDB and read relevant columns
 cond = yesreal == 1 and nc!=1
 if yesreal == 0 or makereweighting or cond:
-    #filename_lab = '/home/barbara/Barbara_Bravi/iedb_uniprot/mhc_ligand_full.csv' ## here delete ##
-    filename_lab = rootf + '/mhc_ligand_full.csv'
+    filename_lab = '/home/barbara/Barbara_Bravi/iedb_uniprot/mhc_ligand_full.csv' ## here delete ##
+    #filename_lab = rootf + '/mhc_ligand_full.csv'
     iedb = pd.read_csv(filename_lab, sep=',')
     head = iedb.columns # select relevant indices
     index_type = 10
@@ -488,6 +488,10 @@ if nc == 1 and yesreal == 1:
                 
 
 else:
+    f = open(log_file,'a+')
+    f.write('Data retrieval from IEDB' + '\n') 
+    f.close()
+    
     iedb_data_T = [] # _T temporary variables
     iedb_cat_T = []
     iedb_qua_T = []
@@ -801,8 +805,11 @@ else:
         iedb_cat_fl = flatten_list(full_cat)
         iedb_ind_tr = list(full_ind_tr)
         iedb_ind_val = list(full_ind_val)
+        
         f = open(log_file,'a+')
-        f.write('Length full data ' + str(len(iedb_data_fl)) + '\n')
+        for cl in range(len(iedb_ind_tr)):
+            f.write('Amount of labelled peptides for ' + list_hla_l[cl] + ' = ' + str(len(iedb_ind_tr[cl])) + '\n')
+        f.write('Length full sample ' + str(len(iedb_data_fl)) + '\n')
         f.close()
 
         iedb_ind=[]
@@ -851,12 +858,15 @@ else:
 
     # Set the PWM to use as reference for the labelling of clusters
     pwm_ref = list(pwm_refD)
+    
+    '''
     if yesreal:
         for cl in range(nc):
             name_fi = out_fold + '/labelled_seqs_'+ out_par + '_' + str(cl)
             with open(name_fi  + '.txt', 'w') as out_f:
                 for r in range(len(iedb_ind_tr[cl])):
                     out_f.write(iedb_data_fl[iedb_ind_tr[cl][r]] + '\n')
+    '''
    
 
 pwm_random = float(1)/float(CC)*np.ones((SA,CC))
@@ -1082,7 +1092,7 @@ for runs in range(Nrun):
     if maketraining:
         best = keras.callbacks.ModelCheckpoint(name_w, monitor='val_categorical_accuracy', verbose=0, save_best_only=True, save_weights_only = True, mode='auto', period=1)
         model.fit(train_data, train_label, epochs =  n_epochs, batch_size=64, shuffle=True, callbacks = [best], validation_data=(val_data, val_label))
-
+        
     model.load_weights(name_w)
 
     # Put forward new labels
