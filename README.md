@@ -34,7 +34,7 @@ http://www.iedb.org/database_export_v3.php
 ## Run the script ##
 We assume to have a custom dataset, e.g. a dataset of unannotated peptides from an elution experiment saved in sample_file.txt, and the HLA-I known to be expressed in the sample, e.g. from HLA-typing, are HLA-A\*01:01, HLA-A\*02:01, HLA-B\*15:01, HLA-B\*27:02, HLA-C\*08:02, HLA-C\*16:01. Running the RBM-MHC script allows to build a presentation model able to: 
 - assign an HLA-I type to each peptide in sample_file.txt;
-- assign presentation scores to a custom list of peptides, e.g. all peptides harbouring cancer-specific mutations (see option -score), to understand what have high likelihood of being presented.
+- assign presentation scores to a custom list of peptides, e.g. all peptides harbouring cancer-specific mutations, to understand which ones have high likelihood of being presented (see option -score).
 
 To run the script, an example command line is: 
 
