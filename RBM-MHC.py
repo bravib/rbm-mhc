@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('-hla', nargs = '+', type = str, required= False, help='HLA-I alleles') # For custom dataset, if not given, only scoring by RBM is performed; For IEDB dataset, if not given, it is set to 'Haplotype1'
 parser.add_argument('-i', type = str, required=False, help='Name of input file (with peptide sequences)') # if not given, IEDB sequences are used
-parser.add_argument('-o', type = str, required=False, help='Name of output folder') # Required for custom datasets. If not given, it is set to 'IEDB_out_Haplotype1' - see data folders available at https://github.com/bravib/ssrbm
+parser.add_argument('-o', type = str, required=False, help='Name of output folder') # Required for custom datasets. If not given, it is set to 'IEDB_out_Haplotype1' - see data folders available at https://github.com/bravib/rbm-mhc
 parser.add_argument('-nameo', type = str, required=False, help='String to appear in file names')
 parser.add_argument('-rl', nargs = '+', type = int, required=False, help='Range of peptide lengths') # if not given, it is set to 8,9,10,11
 parser.add_argument('-mt', type = int, required=False, default = 1, help='0 disables training of the method and reads an existing model')
@@ -53,8 +53,7 @@ if args.perc == 0:
    print('Percentage of labelled data should be > 0')
    exit()
 
-# Decide what to do 
-maketraining = args.mt # whether to train a RBM + classifier
+maketraining = args.mt 
 Nrun = 2
 if args.al == 0:
     Nrun = 1
@@ -486,7 +485,7 @@ if nc == 1 and yesreal == 1:
             nogap1=linesplit[0].replace(' ','')
             if len(nogap1) in range_len:
                 iedb_data_fl.append(nogap1)
-    ## here if given_labels: iedb_ind_tr ##
+                
 
 else:
     iedb_data_T = [] # _T temporary variables
@@ -990,7 +989,7 @@ for runs in range(Nrun):
             lenwes = [len(a) for a in wespepswt]
 
             NAlist = zip(wespepswt, wespeps_g, likwes, lenwes, list(np.repeat(list_hla_l[0],len(likwes))) , likwes)
-            NAstr = 'Sequences' + '\t'+ 'Seqs core' + '\t' + 'RBM Log-Lik.' + '\t' + 'Length' +   '\t' + 'Pred. HLA class' + '\t'  + 'Total ssRBM score'
+            NAstr = 'Sequences' + '\t'+ 'Seqs core' + '\t' + 'RBM Log-Lik.' + '\t' + 'Length' +   '\t' + 'Pred. HLA class' + '\t'  + 'Total RBM-MHC score'
 
             with open(out_fold_NA + '/validation_scored_' +  out_par + '.txt', 'w') as out_f:
                 out_f.write(NAstr + '\n')
@@ -1320,7 +1319,7 @@ for runs in range(Nrun):
     if not(yesreal):
         iedb_data_fl_g = convert_letter(iedb_data_fl_nf)
         OLlist = zip(iedb_data_fl, iedb_data_fl_g, iedb_cat_fl, labels_ssrbm)
-        OLstr = 'Data' + '\t'+ 'Data aligned' + '\t' + 'IEDB HLA' + '\t'+ 'ssRBM HLA'
+        OLstr = 'Data' + '\t'+ 'Data aligned' + '\t' + 'IEDB HLA' + '\t'+ 'RBM-MHC HLA'
         with open(out_fold + '/Table_classification_' +  out_par + '.txt', 'w') as out_f:
             out_f.write(OLstr + '\n')
             writer = csv.writer(out_f, delimiter='\t')
@@ -1349,7 +1348,7 @@ for runs in range(Nrun):
  
         iedb_data_fl_g = convert_letter(iedb_data_fl_nf)
         CLlist = zip(iedb_data_fl,iedb_data_fl_g, labels_tr, labels_rbm)
-        CLstr = 'Data' + '\t'+ 'Data Core' + '\t'+ 'Training' + '\t' + 'ssRBM label' 
+        CLstr = 'Data' + '\t'+ 'Data Core' + '\t'+ 'Training' + '\t' + 'RBM-MHC label' 
         fold_real = out_fold + '/' + args.i + '_classification_' +  out_par + '.txt'
         with open(fold_real, 'w') as out_f:
             out_f.write(CLstr + '\n')
@@ -1492,7 +1491,7 @@ if deg<1:
     # print tables for NA
     NAlist = zip(wespepswt, wespeps_g, likwes, lenwes, pred0, predl, likwes - np.array(ent))
 
-    NAstr = 'Sequences' + '\t'+ 'Seqs core' + '\t' + 'RBM Log-Lik.' + '\t' + 'Length' + '\t' + 'Pred. classifier' + '\t'  + 'Pred. HLA class' + '\t'  + 'Total ssRBM score'
+    NAstr = 'Sequences' + '\t'+ 'Seqs core' + '\t' + 'RBM Log-Lik.' + '\t' + 'Length' + '\t' + 'Pred. classifier' + '\t'  + 'Pred. HLA class' + '\t'  + 'Total RBM-MHC score'
 
     with open(out_fold_NA + '/validation_scored_' +  out_par + '.txt', 'w') as out_f:
         out_f.write(NAstr + '\n')
@@ -1636,7 +1635,7 @@ if NAranking:
     # print tables for NA
     NAlist = zip(wespepswt, wespeps_g, likwes, lenwes, pred0, predl, likwes - np.array(ent))
 
-    NAstr = 'Sequences' + '\t'+ 'Seqs core' + '\t' + 'RBM Log-Lik.' + '\t' + 'Length' + '\t' + 'Pred. classifier' + '\t'  + 'Pred. HLA class' + '\t'  + 'Total ssRBM score'
+    NAstr = 'Sequences' + '\t'+ 'Seqs core' + '\t' + 'RBM Log-Lik.' + '\t' + 'Length' + '\t' + 'Pred. classifier' + '\t'  + 'Pred. HLA class' + '\t'  + 'Total RBM-MHC score'
 
     with open(out_fold_NA + '/' + args.score + '_scored_' +  out_par + '.txt', 'w') as out_f:
         out_f.write(NAstr + '\n')

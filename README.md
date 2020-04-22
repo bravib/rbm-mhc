@@ -32,16 +32,17 @@ http://www.iedb.org/database_export_v3.php
 
 
 ## Run the script ##
-We assume to have a custom dataset, e.g. a dataset of unannotated peptides from an elution experiment saved in sample_file.txt, and the HLA-I known to be expressed in the sample, e.g. from HLA-typing, are HLA-A\*01:01, HLA-A\*02:01, HLA-B\*15:01, HLA-B\*27:02, HLA-C\*08:02, HLA-C\*16:01. Running the RBM-MHC script allows to build a presentation model able to: 
+We assume to have a custom dataset, e.g. a dataset of unannotated peptides from an elution experiment saved in sample_file.txt, and the HLA-I known to be expressed in the sample, e.g. from HLA-typing, are HLA-A\*01:01, HLA-A\*03:01, HLA-B\*07:02, HLA-B\*08:01, HLA-C\*07:02, HLA-C\*07:01. Running the RBM-MHC script allows to build a presentation model able to: 
 - assign an HLA-I type to each peptide in sample_file.txt;
 - assign presentation scores to a custom list of peptides, e.g. all peptides harbouring cancer-specific mutations, to understand which ones have high likelihood of being presented (see option -score).
 
 To run the script, an example command line is: 
 
-python3 RBM-MHC.py -hla 'HLA-A\*01:01' 'HLA-A\*02:01' 'HLA-B\*15:01' 'HLA-B\*27:02' 'HLA-C\*08:02' 'HLA-C\*16:01' -rl 9 10 -i 'sample_file' -o 'output_folder' -nameo 'string_output'
+python3 RBM-MHC.py -hla 'HLA-A\*01:01' 'HLA-A\*03:01' 'HLA-B\*07:02' 'HLA-B\*08:01' 'HLA-C\*07:02' 'HLA-C*07:01' -rl 9 -i 'sample_file' -o 'output_folder' -nameo 'string_output' -score 'peptides-to-score'
 
-This command line reads the peptides of length 9-10 residues from the file NAME_FOLDER/output_folder/sample_file.txt, trains RBM-MHC on them and predicts the peptides specifically binding to the 6 HLA-I provided. The HLA assignment is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The output (trained RBM and HLA-I classifier, table of peptides with assigned HLA-binding specificity) is saved in NAME_FOLDER/output_folder. 
+This command line reads the peptides of length 9 residues from the file NAME_FOLDER/output_folder/sample_file.txt, trains RBM-MHC on them and predicts the peptides specifically binding to the 6 HLA-I provided. The HLA assignment is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The model is used to assign probabilistic scores of presentation to the peptides in the file NAME_FOLDER/output_folder/peptides-to-score.txt. The output (trained RBM and HLA-I classifier, table of peptides with assigned HLA-binding specificity, scored peptides) is saved in NAME_FOLDER/output_folder. 
 
+The 'output_folder' provided as example contains a python notebook that explains how to read and analyze the results from the command above.
 
 ## Options ##
 
