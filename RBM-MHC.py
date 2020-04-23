@@ -1,4 +1,4 @@
-rootf='/home/barbara/Barbara_Bravi/rbm-mhc'
+
 
 import argparse
 parser = argparse.ArgumentParser() 
@@ -169,7 +169,10 @@ if args.hla is None:
 else:
     set_hla = args.hla
     str_hla = 'custom_haplotype'
-    list_hla_l = list(np.unique(set_hla)) # if 2 same alleles, count as 1
+    if len(list(np.unique(set_hla))) != len(list(set_hla)):
+        list_hla_l = list(np.unique(set_hla)) # if 2 same alleles, count as 1
+    else:
+        list_hla_l = list(set_hla)
     nc = len(list_hla_l)
     for y in range(len(set_hla)):
         if 'HLA-A' not in set_hla[y] and 'HLA-B' not in set_hla[y] and 'HLA-C' not in set_hla[y]:
@@ -321,8 +324,8 @@ pseudocount = 0.000001
 # import IEDB and read relevant columns
 cond = yesreal == 1 and nc!=1
 if yesreal == 0 or makereweighting or cond:
-    filename_lab = '/home/barbara/Barbara_Bravi/iedb_uniprot/mhc_ligand_full.csv' ## here delete ##
-    #filename_lab = rootf + '/mhc_ligand_full.csv'
+    #filename_lab = '/home/barbara/Barbara_Bravi/iedb_uniprot/mhc_ligand_full.csv' ## here delete ##
+    filename_lab = rootf + '/mhc_ligand_full.csv'
     iedb = pd.read_csv(filename_lab, sep=',')
     head = iedb.columns # select relevant indices
     index_type = 10
@@ -975,24 +978,26 @@ for runs in range(Nrun):
                 os.mkdir(out_fold_NA)
 
             wespepswt = [a for a in wespepss if len(a) in range_len]
+            if LL == 1:
+                wespeps_n = convert_number(wespepswt)
+            else:
+                name_mat = rootf + '/Align_utils/align_to_seedpy.py'
+                name_seqs = rootf + '/Align_utils/seqs_str.txt'
+                with open(name_seqs, 'w') as out_f:
+                    for u in range(len(wespepswt)):
+                        out_f.write(wespepswt[u] + '\n')
 
-            name_mat = rootf + '/Align_utils/align_to_seedpy.py'
-            name_seqs = rootf + '/Align_utils/seqs_str.txt'
-            with open(name_seqs, 'w') as out_f:
-                for u in range(len(wespepswt)):
-                    out_f.write(wespepswt[u] + '\n')
+                name_seed = rootf + '/Align_utils/seqs_seed.txt'
+                with open(name_seed, 'w') as out_f:
+                    for u in range(len(iedb_data_fl)):
+                        out_f.write(iedb_data_fl[u] + '\n')
 
-            name_seed = rootf + '/Align_utils/seqs_seed.txt'
-            with open(name_seed, 'w') as out_f:
-                for u in range(len(iedb_data_fl)):
-                    out_f.write(iedb_data_fl[u] + '\n')
-
-            subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0 ', shell = True)
-            name_al = rootf + '/Align_utils/aligned_temp.txt'
-            wespeps_n = np.loadtxt(name_al)
-            subprocess.call('rm ' + name_al, shell = True)
-            subprocess.call('rm ' + name_seed, shell = True)
-            subprocess.call('rm ' + name_seqs, shell = True)
+                subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0 ', shell = True)
+                name_al = rootf + '/Align_utils/aligned_temp.txt'
+                wespeps_n = np.loadtxt(name_al)
+                subprocess.call('rm ' + name_al, shell = True)
+                subprocess.call('rm ' + name_seed, shell = True)
+                subprocess.call('rm ' + name_seqs, shell = True)
 
             likwes = RBM.likelihood(wespeps_n.astype(np.int16))
             wespeps_g = convert_letter(wespeps_n.astype(np.int16))
@@ -1023,24 +1028,26 @@ for runs in range(Nrun):
                 os.mkdir(out_fold_NA)
 
             wespepswt = [a for a in wespepss if len(a) in range_len]
+            if LL == 1:
+                wespeps_n = convert_number(wespepswt)
+            else:
+                name_mat = rootf + '/Align_utils/align_to_seedpy.py'
+                name_seqs = rootf + '/Align_utils/seqs_str.txt'
+                with open(name_seqs, 'w') as out_f:
+                    for u in range(len(wespepswt)):
+                        out_f.write(wespepswt[u] + '\n')
 
-            name_mat = rootf + '/Align_utils/align_to_seedpy.py'
-            name_seqs = rootf + '/Align_utils/seqs_str.txt'
-            with open(name_seqs, 'w') as out_f:
-                for u in range(len(wespepswt)):
-                    out_f.write(wespepswt[u] + '\n')
+                name_seed = rootf + '/Align_utils/seqs_seed.txt'
+                with open(name_seed, 'w') as out_f:
+                    for u in range(len(iedb_data_fl)):
+                        out_f.write(iedb_data_fl[u] + '\n')
 
-            name_seed = rootf + '/Align_utils/seqs_seed.txt'
-            with open(name_seed, 'w') as out_f:
-                for u in range(len(iedb_data_fl)):
-                    out_f.write(iedb_data_fl[u] + '\n')
-
-            subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0 ', shell = True)
-            name_al = rootf + '/Align_utils/aligned_temp.txt'
-            wespeps_n = np.loadtxt(name_al)
-            subprocess.call('rm ' + name_al, shell = True)
-            subprocess.call('rm ' + name_seed, shell = True)
-            subprocess.call('rm ' + name_seqs, shell = True)
+                subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0 ', shell = True)
+                name_al = rootf + '/Align_utils/aligned_temp.txt'
+                wespeps_n = np.loadtxt(name_al)
+                subprocess.call('rm ' + name_al, shell = True)
+                subprocess.call('rm ' + name_seed, shell = True)
+                subprocess.call('rm ' + name_seqs, shell = True)
 
             likwes = RBM.likelihood(wespeps_n.astype(np.int16))
             wespeps_g = convert_letter(wespeps_n.astype(np.int16))
@@ -1385,24 +1392,28 @@ if deg<1:
         os.mkdir(out_fold_NA)
 
     wespepswt = [a for a in wespepss if len(a) in range_len]
+    
+    if LL == 1:
+        wespeps_n = convert_number(wespepswt)
+    else:
+        name_mat = rootf + '/Align_utils/align_to_seedpy.py'
+        name_seqs = rootf + '/Align_utils/seqs_str.txt'
+        with open(name_seqs, 'w') as out_f:
+            for u in range(len(wespepswt)):
+                out_f.write(wespepswt[u] + '\n')
 
-    name_mat = rootf + '/Align_utils/align_to_seedpy.py'
-    name_seqs = rootf + '/Align_utils/seqs_str.txt'
-    with open(name_seqs, 'w') as out_f:
-        for u in range(len(wespepswt)):
-            out_f.write(wespepswt[u] + '\n')
+        name_seed = rootf + '/Align_utils/seqs_seed.txt'
+        with open(name_seed, 'w') as out_f:
+             for u in range(len(iedb_data_fl)):
+                 out_f.write(iedb_data_fl[u] + '\n')
 
-    name_seed = rootf + '/Align_utils/seqs_seed.txt'
-    with open(name_seed, 'w') as out_f:
-         for u in range(len(iedb_data_fl)):
-             out_f.write(iedb_data_fl[u] + '\n')
-
-    subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0 ', shell = True)
-    name_al = rootf + '/Align_utils/aligned_temp.txt'
-    wespeps_n = np.loadtxt(name_al)
-    subprocess.call('rm ' + name_al, shell = True)
-    subprocess.call('rm ' + name_seed, shell = True)
-    subprocess.call('rm ' + name_seqs, shell = True)
+        subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0 ', shell = True)
+        name_al = rootf + '/Align_utils/aligned_temp.txt'
+        wespeps_n = np.loadtxt(name_al)       
+        subprocess.call('rm ' + name_al, shell = True)
+        subprocess.call('rm ' + name_seed, shell = True)
+        subprocess.call('rm ' + name_seqs, shell = True)
+    
     Iwes = RBM.vlayer.compute_output(wespeps_n.astype(np.int16), RBM.weights)
 
     # Calculate RBM prediction            
@@ -1422,8 +1433,8 @@ if deg<1:
     wespeps_n_real=[]
     wespeps_g_real=[]
     likwes_real=[]
-    scowes_real=[]
-    scowesHMM_real=[]
+    #scowes_real=[]
+    #scowesHMM_real=[]
     lenwes_real=[]
     pred_real=[]
     predl_real=[]
@@ -1439,39 +1450,42 @@ if deg<1:
         if len(cc) and len(ccw):
             wespeps0 = [wespepswt[u] for u in ccw]
             pred0 = [predwes[u][cl] for u in ccw]  
-            predl = [predwes_labels[u] for u in ccw] 
-            seqs_seedt = [iedb_data_fl[iedb_ind_tr[cl][u]] for u in range(len(iedb_ind_tr[cl]))]
-            seqs_new =  [iedb_data_fl[flatten_list(iedb_ind_val)[u]] for u in cc]
-            pn = [values_newv[u] for u in cc]
-            seqs_seed = list(seqs_seedt + seqs_new)
-
-            name_mat = rootf + '/Align_utils/align_to_seedpy.py'
-            name_seqs = rootf + '/Align_utils/seqs_str.txt'
-            with open(name_seqs, 'w') as out_f:
-                for u in range(len(wespeps0)):
-                    out_f.write(wespeps0[u] + '\n')
-            
-            name_seed = rootf + '/Align_utils/seqs_seed.txt'
-            with open(name_seed, 'w') as out_f:
-                for u in range(len(seqs_seed)):
-                    out_f.write(seqs_seed[u] + '\n')
-            subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0', shell = True)
-            name_al = rootf + '/Align_utils/aligned_temp.txt'
-            wespeps_n = np.loadtxt(name_al)
-            subprocess.call('rm ' + name_al, shell = True)
-            subprocess.call('rm ' + name_seqs, shell = True)
-            subprocess.call('rm ' + name_seed, shell = True)
+            predl = [predwes_labels[u] for u in ccw]
+            if LL == 1:
+                wespeps_n = convert_number(wespeps0)
+            else:
+                seqs_seedt = [iedb_data_fl[iedb_ind_tr[cl][u]] for u in range(len(iedb_ind_tr[cl]))]
+                seqs_new =  [iedb_data_fl[flatten_list(iedb_ind_val)[u]] for u in cc]
+                pn = [values_newv[u] for u in cc]
+                seqs_seed = list(seqs_seedt + seqs_new)
+                name_mat = rootf + '/Align_utils/align_to_seedpy.py'
+                name_seqs = rootf + '/Align_utils/seqs_str.txt'
+                with open(name_seqs, 'w') as out_f:
+                    for u in range(len(wespeps0)):
+                        out_f.write(wespeps0[u] + '\n')
+                
+                name_seed = rootf + '/Align_utils/seqs_seed.txt'
+                with open(name_seed, 'w') as out_f:
+                    for u in range(len(seqs_seed)):
+                        out_f.write(seqs_seed[u] + '\n')
+                subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0', shell = True)
+                name_al = rootf + '/Align_utils/aligned_temp.txt'
+                wespeps_n = np.loadtxt(name_al)
+                subprocess.call('rm ' + name_al, shell = True)
+                subprocess.c#all('rm ' + name_seqs, shell = True)
+                subprocess.call('rm ' + name_seed, shell = True)
+                
             wespeps_g = convert_letter(wespeps_n.astype(np.int16))
-            scowes = list(np.loadtxt(rootf + '/Align_utils/scores_cons.txt'))
-            scowes2 = list(np.loadtxt(rootf + '/Align_utils/scores.txt'))
+            #scowes = list(np.loadtxt(rootf + '/Align_utils/scores_cons.txt'))
+            #scowes2 = list(np.loadtxt(rootf + '/Align_utils/scores.txt'))
             likwes = RBM.likelihood(wespeps_n.astype(np.int16))
             lenwes = [len(a) for a in wespeps0] 
             wespeps_real.append(wespeps0)
             wespeps_g_real.append(wespeps_g)
             wespeps_n_real.append(wespeps_n)
             likwes_real.append(likwes)
-            scowes_real.append(scowes)
-            scowesHMM_real.append(scowes2)
+            #scowes_real.append(scowes)
+            #scowesHMM_real.append(scowes2)
             lenwes_real.append(lenwes)
             pred_real.append(pred0)
             predl_real.append(predl)
@@ -1479,8 +1493,8 @@ if deg<1:
     wespeps_g=[]
     wespeps_n=[]
     likwes=[]
-    scowes=[]
-    scowesHMM=[]
+    #scowes=[]
+    #scowesHMM=[]
     lenwes=[]
     pred0=[]
     predl=[]
@@ -1491,8 +1505,8 @@ if deg<1:
         wespeps_g.append(flatten_list(wespeps_g_real)[ii])
         wespeps_n.append(flatten_list(wespeps_n_real)[ii])
         likwes.append(flatten_list(likwes_real)[ii])
-        scowes.append(flatten_list(scowes_real)[ii])
-        scowesHMM.append(flatten_list(scowesHMM_real)[ii])
+        #scowes.append(flatten_list(scowes_real)[ii])
+        #scowesHMM.append(flatten_list(scowesHMM_real)[ii])
         lenwes.append(flatten_list(lenwes_real)[ii])
         pred0.append(flatten_list(pred_real)[ii])
         predl.append(flatten_list(predl_real)[ii])
@@ -1529,24 +1543,27 @@ if NAranking:
         os.mkdir(out_fold_NA)
 
     wespepswt = [a for a in wespepss if len(a) in range_len]
+    if LL == 1:
+        wespeps_n = convert_number(wespepswt)
+    else:
+        name_mat = rootf + '/Align_utils/align_to_seedpy.py'
+        name_seqs = rootf + '/Align_utils/seqs_str.txt'
+        with open(name_seqs, 'w') as out_f:
+            for u in range(len(wespepswt)):
+                out_f.write(wespepswt[u] + '\n')
 
-    name_mat = rootf + '/Align_utils/align_to_seedpy.py'
-    name_seqs = rootf + '/Align_utils/seqs_str.txt'
-    with open(name_seqs, 'w') as out_f:
-        for u in range(len(wespepswt)):
-            out_f.write(wespepswt[u] + '\n')
+        name_seed = rootf + '/Align_utils/seqs_seed.txt'
+        with open(name_seed, 'w') as out_f:
+             for u in range(len(iedb_data_fl)):
+                 out_f.write(iedb_data_fl[u] + '\n')
 
-    name_seed = rootf + '/Align_utils/seqs_seed.txt'
-    with open(name_seed, 'w') as out_f:
-         for u in range(len(iedb_data_fl)):
-             out_f.write(iedb_data_fl[u] + '\n')
-
-    subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0 ', shell = True)
-    name_al = rootf + '/Align_utils/aligned_temp.txt'
-    wespeps_n = np.loadtxt(name_al)
-    subprocess.call('rm ' + name_al, shell = True)
-    subprocess.call('rm ' + name_seed, shell = True)
-    subprocess.call('rm ' + name_seqs, shell = True)
+        subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0 ', shell = True)
+        name_al = rootf + '/Align_utils/aligned_temp.txt'
+        wespeps_n = np.loadtxt(name_al)
+        subprocess.call('rm ' + name_al, shell = True)
+        subprocess.call('rm ' + name_seed, shell = True)
+        subprocess.call('rm ' + name_seqs, shell = True)
+    
     Iwes = RBM.vlayer.compute_output(wespeps_n.astype(np.int16), RBM.weights)
 
     # Calculate RBM prediction            
@@ -1566,8 +1583,8 @@ if NAranking:
     wespeps_n_real=[]
     wespeps_g_real=[]
     likwes_real=[]
-    scowes_real=[]
-    scowesHMM_real=[]
+    #scowes_real=[]
+    #scowesHMM_real=[]
     lenwes_real=[]
     pred_real=[]
     predl_real=[]
@@ -1584,38 +1601,41 @@ if NAranking:
             wespeps0 = [wespepswt[u] for u in ccw]
             pred0 = [predwes[u][cl] for u in ccw]  
             predl = [predwes_labels[u] for u in ccw] 
-            seqs_seedt = [iedb_data_fl[iedb_ind_tr[cl][u]] for u in range(len(iedb_ind_tr[cl]))]
-            seqs_new =  [iedb_data_fl[flatten_list(iedb_ind_val)[u]] for u in cc]
-            pn = [values_newv[u] for u in cc]
-            seqs_seed = list(seqs_seedt + seqs_new)
+            if LL == 1:
+                wespeps_n = convert_number(wespeps0)
+            else:           
+                seqs_seedt = [iedb_data_fl[iedb_ind_tr[cl][u]] for u in range(len(iedb_ind_tr[cl]))]
+                seqs_new =  [iedb_data_fl[flatten_list(iedb_ind_val)[u]] for u in cc]
+                pn = [values_newv[u] for u in cc]
+                seqs_seed = list(seqs_seedt + seqs_new)
 
-            name_mat = rootf + '/Align_utils/align_to_seedpy.py'
-            name_seqs = rootf + '/Align_utils/seqs_str.txt'
-            with open(name_seqs, 'w') as out_f:
-                for u in range(len(wespeps0)):
-                    out_f.write(wespeps0[u] + '\n')
-            
-            name_seed = rootf + '/Align_utils/seqs_seed.txt'
-            with open(name_seed, 'w') as out_f:
-                for u in range(len(seqs_seed)):
-                    out_f.write(seqs_seed[u] + '\n')
-            subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0', shell = True)
-            name_al = rootf + '/Align_utils/aligned_temp.txt'
-            wespeps_n = np.loadtxt(name_al)
-            subprocess.call('rm ' + name_al, shell = True)
-            subprocess.call('rm ' + name_seqs, shell = True)
-            subprocess.call('rm ' + name_seed, shell = True)
+                name_mat = rootf + '/Align_utils/align_to_seedpy.py'
+                name_seqs = rootf + '/Align_utils/seqs_str.txt'
+                with open(name_seqs, 'w') as out_f:
+                    for u in range(len(wespeps0)):
+                        out_f.write(wespeps0[u] + '\n')
+                
+                name_seed = rootf + '/Align_utils/seqs_seed.txt'
+                with open(name_seed, 'w') as out_f:
+                    for u in range(len(seqs_seed)):
+                        out_f.write(seqs_seed[u] + '\n')
+                subprocess.call('python3 -W ignore ' + name_mat + ' -sseed ' + name_seed + ' -sseqs ' + name_seqs +' -SA ' + str(SA) + ' -SAmin ' + str(SAmin) + ' -SAmax ' + str(SAmax) + ' -yw 0', shell = True)
+                name_al = rootf + '/Align_utils/aligned_temp.txt'
+                wespeps_n = np.loadtxt(name_al)
+                subprocess.call('rm ' + name_al, shell = True)
+                subprocess.call('rm ' + name_seqs, shell = True)
+                subprocess.call('rm ' + name_seed, shell = True)
             wespeps_g = convert_letter(wespeps_n.astype(np.int16))
-            scowes = list(np.loadtxt(rootf + '/Align_utils/scores_cons.txt'))
-            scowes2 = list(np.loadtxt(rootf + '/Align_utils/scores.txt'))
+            #scowes = list(np.loadtxt(rootf + '/Align_utils/scores_cons.txt'))
+            #scowes2 = list(np.loadtxt(rootf + '/Align_utils/scores.txt'))
             likwes = RBM.likelihood(wespeps_n.astype(np.int16))
             lenwes = [len(a) for a in wespeps0] 
             wespeps_real.append(wespeps0)
             wespeps_g_real.append(wespeps_g)
             wespeps_n_real.append(wespeps_n)
             likwes_real.append(likwes)
-            scowes_real.append(scowes)
-            scowesHMM_real.append(scowes2)
+            #scowes_real.append(scowes)
+            #scowesHMM_real.append(scowes2)
             lenwes_real.append(lenwes)
             pred_real.append(pred0)
             predl_real.append(predl)
@@ -1623,8 +1643,8 @@ if NAranking:
     wespeps_g=[]
     wespeps_n=[]
     likwes=[]
-    scowes=[]
-    scowesHMM=[]
+    #scowes=[]
+    #scowesHMM=[]
     lenwes=[]
     pred0=[]
     predl=[]
@@ -1635,8 +1655,8 @@ if NAranking:
         wespeps_g.append(flatten_list(wespeps_g_real)[ii])
         wespeps_n.append(flatten_list(wespeps_n_real)[ii])
         likwes.append(flatten_list(likwes_real)[ii])
-        scowes.append(flatten_list(scowes_real)[ii])
-        scowesHMM.append(flatten_list(scowesHMM_real)[ii])
+        #scowes.append(flatten_list(scowes_real)[ii])
+        #scowesHMM.append(flatten_list(scowesHMM_real)[ii])
         lenwes.append(flatten_list(lenwes_real)[ii])
         pred0.append(flatten_list(pred_real)[ii])
         predl.append(list_hla_l[flatten_list(predl_real)[ii]])

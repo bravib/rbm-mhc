@@ -1,4 +1,4 @@
-rootf='/home/barbara/Barbara_Bravi/rbm-mhc'
+
 
 import numpy as np
 curr_int = np.int16
