@@ -14,8 +14,7 @@ express or implied. In no event shall the author or contributors be
 liable for any damage arising out of the use of this software.
 
 The publication of research using this software, modified or not, must include 
-appropriate citations to:
-...
+appropriate citations to: Bravi et al. [reference to define] 
 
 ## Download and Install the packages ## 
 
