@@ -729,9 +729,6 @@ class RBM(pgm.PGM):
             else:
                 lik = self.pseudo_likelihood(data).mean()
             print('Iteration number 0, pseudo-likelihood: %.2f'%lik)
-            f = open('/home/barbara/Barbara_Bravi/rbm/covid_S_hu25/log.txt','a+')
-            f.write(str(lik) + '\n')
-            f.close()
 
 
         result = {}
@@ -897,11 +894,7 @@ class RBM(pgm.PGM):
                 if ('TAU' in record) | self.adapt_MC:
                     message += ", tau = %.2f"%tau
                 print(message)
-                f = open('/home/barbara/Barbara_Bravi/rbm/covid_S_hu25/log.txt','a+')
-                f.write(str(lik) + '\n')
-                f.close()
-
-
+                
 
 
             if shuffle_data:

@@ -324,7 +324,6 @@ pseudocount = 0.000001
 # import IEDB and read relevant columns
 cond = yesreal == 1 and nc!=1
 if yesreal == 0 or makereweighting or cond:
-    #filename_lab = '/home/barbara/Barbara_Bravi/iedb_uniprot/mhc_ligand_full.csv' ## here delete ##
     filename_lab = rootf + '/mhc_ligand_full.csv'
     iedb = pd.read_csv(filename_lab, sep=',')
     head = iedb.columns # select relevant indices
