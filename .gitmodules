@@ -1,0 +1,3 @@
+[submodule "PGM"]
+	path = PGM
+	url = git://github.com/jertubiana/PGM

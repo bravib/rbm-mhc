@@ -95,21 +95,22 @@ else:
    print('peptide lengths not recognized - see options admitted')
    exit()
 
-
-import sys, os, pickle
-sys.path.append(rootf + '/PGM3/source/')
-sys.path.append(rootf + '/PGM3/utilities/')
-sys.path.append(rootf + '/Align_seqs/')
-from common_imports import *
+import sys,os,pickle
+sys.path.append(rootf + '/PGM/source/')
+sys.path.append(rootf + '/PGM/utilities/')
+sys.path.append(rootf + '/Align_utils/')
+from common_imports import set_num_threads
+set_num_threads(1) # Set the number of cores. Must be executed before importing numpy&numba.
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import rbm,utilities
+import Proteins_utils, RBM_utils, utilities,sequence_logo,plots_utils
 import csv
+import importlib
 
 from scipy.stats import percentileofscore
 import subprocess
-
-import dataset_utils, plots_utils, RBM_utils, evaluate_learning_utils, Proteins_utils, sequence_logo
-import utilities as utilities
-import rbm as rbm
-import importlib
 
 
 #RBM and Decoder parameters  

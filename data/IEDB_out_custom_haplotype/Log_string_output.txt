@@ -1,0 +1,21 @@
+Data retrieval from IEDB
+Total data HLA-A*01:01 = 10945
+Total data HLA-A*03:01 = 5214
+Total data HLA-B*07:02 = 5538
+Total data HLA-B*08:01 = 1663
+Total data HLA-C*07:01 = 1490
+Total data HLA-C*07:02 = 2059
+Final data HLA-A*01:01 = 4378 for average length 9.5
+Final data HLA-A*03:01 = 2756 for average length 9.5
+Final data HLA-B*07:02 = 3831 for average length 9.5
+Final data HLA-B*08:01 = 1423 for average length 9.5
+Final data HLA-C*07:01 = 794 for average length 9.5
+Final data HLA-C*07:02 = 1290 for average length 9.5
+Unlabelled only, iteration 0 RBM 
+ AUC 0.5191303377567267 AUC Rank 0.5088897668018323 Accuracy 0.501883578087358 Precision 0.5342192720495474 Sensitivity 0.1985505629278779 Specificity 0.8397101125855754
+Full set, iteration 0 RBM 
+ AUC 0.585922300099498 AUC Rank 0.6342319158202961 Accuracy 0.5577065122640045 Precision 0.711484392171409 Sensitivy 0.30987050016582995 Specificity 0.861974100033166
+Unlabelled only, iteration 1 RBM 
+ AUC 0.5060103985164389 AUC Rank 0.5008280477618411 Accuracy 0.4712292169527322 Precision 0.5222488257404836 Sensitivity 0.17668399752739805 Specificity 0.8353367995054797
+Full set, iteration 1 RBM 
+ AUC 0.5722869105562209 AUC Rank 0.6321635098803305 Accuracy 0.5328324722835279 Precision 0.7257501488979826 Sensitivy 0.28714485092703507 Specificity 0.8574289701854069
