@@ -22,9 +22,9 @@ RBM-MHC is written in Python version 3.6.9
 
 Packages required: biopython, numba, keras (with Theano or tensorFlow backend), scikit-learn, along with standard packages (numpy, cython, matplotlib). The alignment routines require matlab and matlab engine API for Python https://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 
-PyMesh also has a dependency on the RBM implementation Copyright 2020 by Jerome Tubiana, imported from https://github.com/jertubiana/PGM
+RBM-MHC has a dependency on the RBM implementation Copyright 2020 by Jerome Tubiana, directly imported as a submodule from https://github.com/jertubiana/PGM
 
-The RBM-MHC.py script, the folder Align_utils and the package PGM should be saved in the same folder. The path to this folder should be  specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
+The RBM-MHC.py script, the folders Align_utils and PGM should be saved in the same folder. The path to this folder should be  specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
 
 python3 setup.py
 
