@@ -86,11 +86,11 @@ else:
 if set(range_len) == set([8, 9, 10, 11]) or set(range_len) == set([8, 9, 10]) or set(range_len) == set([8, 9]) or set(range_len) == set([9]):
     SA = 9
     SAmin = 8
-    SAmax = 10
+    SAmax = 11
 elif set(range_len) == set([9, 10, 11]) or set(range_len) == set([9, 10]):
     SA = 9
     SAmin = 9
-    SAmax = 10    
+    SAmax = 11    
 else: 
    print('peptide lengths not recognized - see options admitted')
    exit()
