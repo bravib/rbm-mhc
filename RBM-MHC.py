@@ -919,11 +919,11 @@ for runs in range(Nrun):
     all_data = np.copy(iedb_data_fl_ntemp)
 
     if makereweighting:
-        pc_ms = float(1)/float(len(seqs_msL))
+        pc_ms = 0.0015 # pseudo-count adapted on cysteine frequency to avoid too large weights \alpha
         if args.rwhp:
             pc_nms = pc
         if args.rwnms:
-            pc_nms = float(1)/float(len(seqs_nmsL))
+            pc_nms = 0.0015
         alphas_rbm=[]
         for m in range(len(all_data)):
             alpha = 1
