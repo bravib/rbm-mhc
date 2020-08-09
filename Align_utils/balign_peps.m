@@ -72,7 +72,7 @@ p_old= p{lepmin};
 if yes_weight
 w_old = W{lepmin};
 end
-if lepmin < lepmax
+if lepmin < lepmax  & lepmax ~=lea & lepmin ~=lea
 if lepmin + 1 < lepmax % lep decides which lengths should be considered in the alignment
 for ll=lepmin + 1 : lepmax
     nl=nl+1;
@@ -130,7 +130,7 @@ elseif lepmin==lea
     else
      p_old=seqprofile(a_old,'gaps','all','counts',true); % contains all previous lengths
     end
-else
+elseif lepmax == lea
   ll=lepmax;
     nl=nl+1;
     if(dist(ll)>0)
