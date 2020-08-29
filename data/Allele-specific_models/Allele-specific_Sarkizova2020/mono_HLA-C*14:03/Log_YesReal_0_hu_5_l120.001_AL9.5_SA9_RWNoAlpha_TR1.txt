@@ -1,0 +1,3 @@
+Data retrieval from IEDB
+Total data HLA-C*14:03 = 3218
+Final data HLA-C*14:03 = 2561 for average length 9.5

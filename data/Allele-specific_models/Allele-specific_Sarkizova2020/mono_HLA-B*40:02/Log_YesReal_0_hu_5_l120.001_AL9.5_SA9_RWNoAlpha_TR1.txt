@@ -1,0 +1,3 @@
+Data retrieval from IEDB
+Total data HLA-B*40:02 = 6416
+Final data HLA-B*40:02 = 4745 for average length 9.5
