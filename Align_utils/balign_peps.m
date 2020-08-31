@@ -67,12 +67,13 @@ end
 nl=0; 
 lo=lepmin; 
 a_old=al{lepmin,1};
+a_new2 = a_old;
 l_old=dist(lepmin); 
 p_old= p{lepmin};
 if yes_weight
 w_old = W{lepmin};
 end
-if lepmin < lepmax  & lepmax ~=lea & lepmin ~=lea
+if lepmin < lepmax
 if lepmin + 1 < lepmax % lep decides which lengths should be considered in the alignment
 for ll=lepmin + 1 : lepmax
     nl=nl+1;

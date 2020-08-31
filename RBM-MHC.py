@@ -1324,7 +1324,7 @@ for runs in range(Nrun):
             iedb_data_fl_ntemp = np.copy(iedb_data_fl_repl[0])
             for i in range(len(flatten_list(iedb_ind_val))):
                 ii = flatten_list(iedb_ind_val)[i]
-                if len((iedb_data_fl)) != SA:
+                if len((iedb_data_fl)) != 0:
                     vec_scores = [np.exp(opt_score[ii][cl])/sum(np.exp(opt_score[ii])) for cl in range(nc)]
                     vec_scores = [(opt_score[ii][cl]**mex) for cl in range(nc)]
                     maxvs = np.argmax(vec_scores)
