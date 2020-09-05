@@ -44,7 +44,7 @@ This command line reads the peptides of length 9 residues from the file NAME_FOL
 
 The 'output_folder' provided as example contains a python notebook that explains how to read and analyze the results from the command above. When considering only fixed-length peptides (as here 9 residues) no alignment, hence no Matlab routine, needs to be called. 
 
-To use datasets and trained models discussed in Bravi et al. [reference to define], the user can refer to the folder rbm-mhc-data, imported as a submodule and downloadable from 
+To use datasets and trained models discussed in Bravi et al. [reference to define], the user can refer to the folder rbm-mhc-data, imported as a submodule and downloadable from https://github.com/bravib/rbm-mhc-data 
 
 ## Options ##
 
