@@ -1,3 +1,0 @@
-Data retrieval from IEDB
-Total data HLA-A*66:01 = 2269
-Final data HLA-A*66:01 = 1770 for average length 9.5
