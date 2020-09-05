@@ -22,7 +22,7 @@ RBM-MHC is written in Python version 3.6.9
 
 Packages required: biopython, numba, keras (with Theano or tensorFlow backend), scikit-learn, along with standard packages (numpy, cython, matplotlib). The alignment routines require matlab and matlab engine API for Python https://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 
-RBM-MHC has a dependency on the RBM implementation Copyright 2020 by Jerome Tubiana, directly imported as a submodule from https://github.com/jertubiana/PGM
+RBM-MHC has a dependency on the RBM implementation Copyright 2020 by Jerome Tubiana, imported as a submodule and downloadable from https://github.com/jertubiana/PGM
 
 The RBM-MHC.py script, the folders Align_utils and PGM should be saved in the same folder. The path to this folder should be  specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
 
@@ -43,6 +43,8 @@ python3 RBM-MHC.py -hla 'HLA-A\*01:01' 'HLA-A\*03:01' 'HLA-B\*07:02' 'HLA-B\*08:
 This command line reads the peptides of length 9 residues from the file NAME_FOLDER/output_folder/sample_file.txt, trains RBM-MHC on them and predicts the peptides specifically binding to the 6 HLA-I provided. The HLA assignment is guided by an amount of labelled peptides for these specificities, equal to 0.1 of the sample size, extracted from IEDB. The model is used to assign probabilistic scores of presentation to the peptides in the file NAME_FOLDER/output_folder/peptides-to-score.txt. The output (trained RBM and HLA-I classifier, table of peptides with assigned HLA-binding specificity, scored peptides) is saved in NAME_FOLDER/output_folder. 
 
 The 'output_folder' provided as example contains a python notebook that explains how to read and analyze the results from the command above. When considering only fixed-length peptides (as here 9 residues) no alignment, hence no Matlab routine, needs to be called. 
+
+To use datasets and trained models discussed in Bravi et al. [reference to define], the user can refer to the folder rbm-mhc-data, imported as a submodule and downloadable from 
 
 ## Options ##
 
