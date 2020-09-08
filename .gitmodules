@@ -1,6 +1,3 @@
 [submodule "PGM"]
 	path = PGM
 	url = git://github.com/jertubiana/PGM
-[submodule "rbm-mhc-data"]
-	path = rbm-mhc-data
-	url = https://github.com/bravib/rbm-mhc-data
