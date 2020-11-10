@@ -341,7 +341,7 @@ if yesreal == 0 or makereweighting or cond:
 
     # conditions of selection of MS data
     condition0 = iedb[head[index_type]] == 'Linear peptide'
-    condition1 = iedb[head[index_species]].isin(['human (Homo sapiens)', 'Homo sapiens']) 
+    condition1 = iedb[head[index_species]].isin(['human (Homo sapiens)', 'Homo sapiens', 'Homo sapiens (human)']) 
     condition2 = iedb['MHC.3'] == 'I'
     condition3 = iedb[head[index_quality]].isin(quality_pos) 
     condition5 = iedb['Assay.1'].isin(['cellular MHC/mass spectrometry', 'mass spectrometry', 'secreted MHC/mass spectrometry'])
