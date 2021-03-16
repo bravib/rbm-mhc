@@ -1,6 +1,6 @@
 ## RBM-MHC Python3 script ##
 
-Python3 script to implement RBM-MHC, a Restricted Boltzmann Machine (RBM)-based method described in Bravi et al. 2020 to predict antigen presentation and for HLA-I motif reconstruction. 
+Python3 script to implement RBM-MHC, a Restricted Boltzmann Machine (RBM)-based method to predict antigen presentation and for HLA-I motif reconstruction. 
 
 ## Copyright ##
 Copyright 2020 - by Barbara Bravi (bbravi.bb@gmail.com)
@@ -13,8 +13,7 @@ been made. This software is distributed without any warranty,
 express or implied. In no event shall the author or contributors be 
 liable for any damage arising out of the use of this software.
 
-The publication of research using this software, modified or not, must include 
-appropriate citations to: Bravi et al. [reference to define] 
+The publication of research using this software, modified or not, must include appropriate citations to: Bravi et al. Cell Systems 2021 https://www.sciencedirect.com/science/article/pii/S2405471220304567
 
 ## Download and Install the packages ## 
 
@@ -24,7 +23,7 @@ Packages required: biopython, numba, keras (with Theano or tensorFlow backend), 
 
 RBM-MHC has a dependency on the RBM implementation Copyright 2020 by Jerome Tubiana, imported as a submodule and downloadable from https://github.com/jertubiana/PGM
 
-The RBM-MHC.py script, the folders Align_utils and PGM should be saved in the same folder. The path to this folder should be  specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
+The RBM-MHC.py script, the folders Align_utils and PGM should be saved in the same folder. The path to this folder should be specified inside setup.py (assigned to NAME_FOLDER). Run this script to set the right path:
 
 python3 setup.py
 
