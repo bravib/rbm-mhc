@@ -355,7 +355,7 @@ if yesreal == 0 or makereweighting or cond:
     c_ex11 = iedb['Assay.1'] == 'purified MHC/direct/radioactivity'
     c_ex12 = iedb['Assay.2'] == 'dissociation constant KD'
     c_ex21 = iedb['Assay.1'] == 'purified MHC/direct/fluorescence'
-    c_ex22 = ['Assay.2'] == 'half maximal effective concentration (EC50)'
+    c_ex22 = iedb['Assay.2'] == 'half maximal effective concentration (EC50)'
     c_ex31 = iedb['Assay.1'] == 'cellular MHC/direct/fluorescence'
     c_ex32 = iedb['Assay.2'] == 'half maximal effective concentration (EC50)'
 
@@ -505,10 +505,7 @@ else:
         condition4 = iedb['MHC'] == list_hla_l[l]
         if args.ba == 1:
 
-            iedb1 = iedb[~(c_ex11 & c_ex12)]
-            iedb2= iedb1[~(c_ex21 & c_ex22)]
-            iedb3= iedb2[~(c_ex31 & c_ex32)]
-            iedb_hla_pos = iedb3[condition0 & condition1 & condition2 & condition4 & condition_ba1 & condition_ba2]
+            iedb_hla_pos = iedb[~(c_ex11 & c_ex12) & ~(c_ex21 & c_ex22) & ~(c_ex31 & c_ex32) & condition0 & condition1 & condition2 & condition4 & condition_ba1 & condition_ba2]
             size_nc.append(len(iedb_hla_pos))
             an_chla = (iedb_hla_pos.values)[:,index_antigen]
             ba_chla = (iedb_hla_pos.values)[:,85]
