@@ -13,11 +13,14 @@ been made. This software is distributed without any warranty,
 express or implied. In no event shall the author or contributors be 
 liable for any damage arising out of the use of this software.
 
-The publication of research using this software, modified or not, must include appropriate citations to: Bravi et al. Cell Systems 2021 https://www.sciencedirect.com/science/article/pii/S2405471220304567
+The publication of research using this software, modified or not, must include appropriate citations to: [Bravi et al. Cell Systems 2021](https://www.sciencedirect.com/science/article/pii/S2405471220304567).
+
+## Additional contributions ##
+January 2025 update of the main script - see RBM-MHC.py - has been carried out by [Yinfei Yang](https://github.com/Coco-fei).
 
 ## Download and Install the packages ## 
 
-RBM-MHC is written in Python version 3.6.9
+RBM-MHC.py was written in Python version 3.6.9. RBM-MHC_update.py is designed for Python 3.12 and the current version of IEDB (as of January 2025).
 
 Packages required: biopython, numba, keras (with Theano or tensorFlow backend), scikit-learn, along with standard packages (numpy, cython, matplotlib). The alignment routines require matlab and matlab engine API for Python https://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 
@@ -87,7 +90,4 @@ The 'output_folder' provided as example contains a python notebook that explains
 ## Data retrieval from Immune Epitope Database ###
 
 To guide motif reconstruction in samples of interest for the user, RBM-MHC uses an amount of peptides equal to (percentage provided by -perc)x(sample size) labelled with their HLA association. The current routine seeks an overlap between the sample and IEDB in such a way that these peptides can be assigned a known HLA preference. If there is little overlap, it adds labelled peptides from IEDB. The search first targets monoallelic source data as described in the paper. If less than a given amount of sequences (set by default to 300) are retrieved, the search is first extended to 'Allele Specific Purification' mass spectrometry (MS) data, next, if the latter are not available, to all MS-data, next to data obtained by all techniques (thus e.g. by binding affinity assays). Regardless of the technique, this labelled set of sequences is chosen among ligands annotated as 'positive', 'positive-high' to the HLA-I alleles under consideration. By the option -ba the search for labelled peptides can be instead performed in IEDB data from binding assays. 
-
-## Trouble-shooting
-version of h5py should be < 3 
 
