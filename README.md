@@ -16,7 +16,7 @@ liable for any damage arising out of the use of this software.
 The publication of research using this software, modified or not, must include appropriate citations to: [Bravi et al. Cell Systems 2021](https://www.sciencedirect.com/science/article/pii/S2405471220304567).
 
 ## Additional contributions ##
-January 2025 update of the main script - see RBM-MHC.py - has been carried out by [Yinfei Yang](https://github.com/Coco-fei).
+January 2025 update of the main script - see RBM-MHC_update.py - has been carried out by [Yinfei Yang](https://github.com/Coco-fei).
 
 ## Download and Install the packages ## 
 
